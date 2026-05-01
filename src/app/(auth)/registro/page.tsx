@@ -146,7 +146,7 @@ export default function RegistroPage() {
           <form onSubmit={handleRegister} className="space-y-4">
 
             {/* Nombres y Apellidos */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="first_name">Nombres *</Label>
                 <Input
@@ -208,7 +208,7 @@ export default function RegistroPage() {
             </div>
 
             {/* Género y Fecha de nacimiento */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="gender">Género *</Label>
                 <Select
@@ -239,7 +239,7 @@ export default function RegistroPage() {
             </div>
 
             {/* Contraseñas */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="password">Contraseña *</Label>
                 <Input

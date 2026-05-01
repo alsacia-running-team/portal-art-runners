@@ -103,43 +103,45 @@ async function handleApprove(userId: string) {
               No hay solicitudes pendientes en este momento.
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Correo</TableHead>
-                  <TableHead>Identificación</TableHead>
-                  <TableHead>Teléfono</TableHead>
-                  <TableHead>Fecha solicitud</TableHead>
-                  <TableHead>Acción</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {solicitudes.map((solicitud) => (
-                  <TableRow key={solicitud.id}>
-                    <TableCell className="font-medium">
-                      {solicitud.first_name} {solicitud.last_name}
-                    </TableCell>
-                    <TableCell>{solicitud.email}</TableCell>
-                    <TableCell>{solicitud.identification}</TableCell>
-                    <TableCell>{solicitud.phone}</TableCell>
-                    <TableCell>{formatDate(solicitud.created_at)}</TableCell>
-                    <TableCell>
-                      <Button
-                        size="sm"
-                        onClick={() => handleApprove(solicitud.id)}
-                        disabled={approving === solicitud.id}
-                      >
-                        {approving === solicitud.id
-                          ? 'Aprobando...'
-                          : 'Aprobar'
-                        }
-                      </Button>
-                    </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Correo</TableHead>
+                    <TableHead>Identificación</TableHead>
+                    <TableHead>Teléfono</TableHead>
+                    <TableHead>Fecha solicitud</TableHead>
+                    <TableHead>Acción</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {solicitudes.map((solicitud) => (
+                    <TableRow key={solicitud.id}>
+                      <TableCell className="font-medium">
+                        {solicitud.first_name} {solicitud.last_name}
+                      </TableCell>
+                      <TableCell>{solicitud.email}</TableCell>
+                      <TableCell>{solicitud.identification}</TableCell>
+                      <TableCell>{solicitud.phone}</TableCell>
+                      <TableCell>{formatDate(solicitud.created_at)}</TableCell>
+                      <TableCell>
+                        <Button
+                          size="sm"
+                          onClick={() => handleApprove(solicitud.id)}
+                          disabled={approving === solicitud.id}
+                        >
+                          {approving === solicitud.id
+                            ? 'Aprobando...'
+                            : 'Aprobar'
+                          }
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

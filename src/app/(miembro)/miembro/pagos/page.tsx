@@ -100,37 +100,39 @@ export default function HistorialPagosPage() {
               Aún no tienes pagos registrados.
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Fecha</TableHead>
-                  <TableHead>Plan</TableHead>
-                  <TableHead>Periodo</TableHead>
-                  <TableHead>Monto</TableHead>
-                  <TableHead>Estado</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {payments.map((payment) => (
-                  <TableRow key={payment.id}>
-                    <TableCell>{formatDate(payment.paid_at)}</TableCell>
-                    <TableCell>
-                      {payment.plans
-                        ? `${payment.plans.name} (${payment.plans.frequency})`
-                        : '—'
-                      }
-                    </TableCell>
-                    <TableCell className="text-sm text-gray-500">
-                      {formatDate(payment.period_start)} — {formatDate(payment.period_end)}
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatPrice(payment.amount_cop)}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(payment.status)}</TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Fecha</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Periodo</TableHead>
+                    <TableHead>Monto</TableHead>
+                    <TableHead>Estado</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {payments.map((payment) => (
+                    <TableRow key={payment.id}>
+                      <TableCell>{formatDate(payment.paid_at)}</TableCell>
+                      <TableCell>
+                        {payment.plans
+                          ? `${payment.plans.name} (${payment.plans.frequency})`
+                          : '—'
+                        }
+                      </TableCell>
+                      <TableCell className="text-sm text-gray-500">
+                        {formatDate(payment.period_start)} — {formatDate(payment.period_end)}
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formatPrice(payment.amount_cop)}
+                      </TableCell>
+                      <TableCell>{getStatusBadge(payment.status)}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>

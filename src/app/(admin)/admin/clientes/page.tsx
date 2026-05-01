@@ -197,72 +197,74 @@ export default function ClientesPage() {
               No se encontraron clientes con esos filtros.
             </p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Correo</TableHead>
-                  <TableHead>Teléfono</TableHead>
-                  <TableHead>Plan</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Pago</TableHead>
-                  <TableHead>Acción</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredClients.map((client) => {
-                  const paymentStatus = getPaymentStatus(client)
-                  return (
-                    <TableRow key={client.id}>
-                      <TableCell className="font-medium">
-                        {client.first_name} {client.last_name}
-                      </TableCell>
-                      <TableCell>{client.email}</TableCell>
-                      <TableCell>{client.phone}</TableCell>
-                      <TableCell>
-                        {client.plans
-                          ? `${client.plans.name} (${client.plans.frequency})`
-                          : <span className="text-gray-400">Sin plan</span>
-                        }
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={client.account_status === 'approved' ? 'default' : 'destructive'}
-                        >
-                          {client.account_status === 'approved' ? 'Activo' : 'Suspendido'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={paymentStatus === 'al_dia' ? 'default' : 'destructive'}
-                          className={paymentStatus === 'al_dia' ? 'bg-green-600' : ''}
-                        >
-                          {paymentStatus === 'al_dia' ? 'Al día' : 'Pendiente'}
-                        </Badge>
-                      </TableCell>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Correo</TableHead>
+                    <TableHead>Teléfono</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Estado</TableHead>
+                    <TableHead>Pago</TableHead>
+                    <TableHead>Acción</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredClients.map((client) => {
+                    const paymentStatus = getPaymentStatus(client)
+                    return (
+                      <TableRow key={client.id}>
+                        <TableCell className="font-medium">
+                          {client.first_name} {client.last_name}
+                        </TableCell>
+                        <TableCell>{client.email}</TableCell>
+                        <TableCell>{client.phone}</TableCell>
                         <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => router.push(`/admin/clientes/${client.id}`)}
+                          {client.plans
+                            ? `${client.plans.name} (${client.plans.frequency})`
+                            : <span className="text-gray-400">Sin plan</span>
+                          }
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={client.account_status === 'approved' ? 'default' : 'destructive'}
                           >
-                            Editar
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant={client.account_status === 'approved' ? 'destructive' : 'default'}
-                            onClick={() => handleToggleStatus(client)}
+                            {client.account_status === 'approved' ? 'Activo' : 'Suspendido'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={paymentStatus === 'al_dia' ? 'default' : 'destructive'}
+                            className={paymentStatus === 'al_dia' ? 'bg-green-600' : ''}
                           >
-                            {client.account_status === 'approved' ? 'Suspender' : 'Activar'}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
+                            {paymentStatus === 'al_dia' ? 'Al día' : 'Pendiente'}
+                          </Badge>
+                        </TableCell>
+                          <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => router.push(`/admin/clientes/${client.id}`)}
+                            >
+                              Editar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant={client.account_status === 'approved' ? 'destructive' : 'default'}
+                              onClick={() => handleToggleStatus(client)}
+                            >
+                              {client.account_status === 'approved' ? 'Suspender' : 'Activar'}
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
           )}
         </CardContent>
       </Card>
