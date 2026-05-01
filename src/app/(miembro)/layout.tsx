@@ -72,7 +72,7 @@ export default function MiembroLayout({
           ))}
           <Button
             variant="outline"
-            className="w-full mt-2 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+            className="w-full mt-2 border-gray-600 text-gray-900 hover:bg-gray-800 hover:text-white"
             onClick={handleLogout}
           >
             Cerrar sesión
@@ -103,7 +103,7 @@ export default function MiembroLayout({
 
         <Button
           variant="outline"
-          className="mt-4 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+          className="mt-4 border-gray-600 text-gray-900 hover:bg-gray-800 hover:text-white"
           onClick={handleLogout}
         >
           Cerrar sesión
