@@ -40,8 +40,11 @@ export default function SolicitudesPage() {
     setLoading(false)
   }
 
-  async function handleApprove(userId: string) {
+async function handleApprove(userId: string) {
     setApproving(userId)
+
+    // Buscar datos del usuario para el email
+    const userToApprove = solicitudes.find(s => s.id === userId)
 
     // Actualizar el estado de la cuenta a 'approved'
     const { error } = await supabase
@@ -53,6 +56,18 @@ export default function SolicitudesPage() {
       .eq('id', userId)
 
     if (!error) {
+      // Enviar email de aprobación
+      if (userToApprove) {
+        await fetch('/api/email/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: userToApprove.email,
+            firstName: userToApprove.first_name,
+          }),
+        })
+      }
+
       // Quitar la solicitud de la lista
       setSolicitudes(prev => prev.filter(s => s.id !== userId))
     }
