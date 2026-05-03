@@ -37,6 +37,14 @@ export default function ClientesPage() {
   const router = useRouter()
   const supabase = createClient()
 
+  function formatPrice(amount: number) {
+    return new Intl.NumberFormat('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0,
+    }).format(amount)
+  }
+
   useEffect(() => {
     loadClients()
     loadPlans()
@@ -117,6 +125,7 @@ export default function ClientesPage() {
     // Filtro por plan
     const matchesPlan =
       filterPlan === 'all' ||
+      (filterPlan === 'sin_plan' && !client.plan_id) ||
       (client.plans && `${client.plans.name}-${client.plans.frequency}` === filterPlan)
 
     // Filtro por estado de pago
@@ -205,6 +214,7 @@ export default function ClientesPage() {
                     <TableHead>Correo</TableHead>
                     <TableHead>Teléfono</TableHead>
                     <TableHead>Plan</TableHead>
+                    <TableHead>Precio</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead>Pago</TableHead>
                     <TableHead>Acción</TableHead>
@@ -224,6 +234,12 @@ export default function ClientesPage() {
                           {client.plans
                             ? `${client.plans.name} (${client.plans.frequency})`
                             : <span className="text-gray-400">Sin plan</span>
+                          }
+                        </TableCell>
+                        <TableCell>
+                          {client.plans
+                            ? formatPrice(client.custom_price_cop ?? client.plans.price_cop)
+                            : <span className="text-gray-400">—</span>
                           }
                         </TableCell>
                         <TableCell>

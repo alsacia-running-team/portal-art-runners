@@ -21,6 +21,7 @@ export type User = {
   role: 'member' | 'admin'
   account_status: 'pending' | 'approved' | 'suspended'
   plan_id: string | null
+  custom_price_cop: number | null
   is_courtesy: boolean
   joined_at: string | null
   cutoff_date: string | null

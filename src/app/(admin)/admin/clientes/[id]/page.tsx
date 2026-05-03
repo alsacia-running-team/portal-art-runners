@@ -57,8 +57,28 @@ export default function EditarClientePage() {
     if (data) setPlans(data)
   }
 
-  function updateField(field: string, value: string | boolean | null) {
+  function updateField(field: string, value: string | number | boolean | null) {
     setFormData(prev => ({ ...prev, [field]: value }))
+    setSuccess(false)
+  }
+
+  function updatePlan(planId: string) {
+    if (planId === 'sin_plan') {
+      setFormData(prev => ({
+        ...prev,
+        plan_id: null,
+        custom_price_cop: null,
+      }))
+      setSuccess(false)
+      return
+    }
+
+    const selectedPlan = plans.find((plan) => plan.id === planId)
+    setFormData(prev => ({
+      ...prev,
+      plan_id: planId,
+      custom_price_cop: selectedPlan?.price_cop ?? prev.custom_price_cop ?? null,
+    }))
     setSuccess(false)
   }
 
@@ -78,6 +98,7 @@ export default function EditarClientePage() {
         gender: formData.gender,
         birth_date: formData.birth_date,
         plan_id: formData.plan_id,
+        custom_price_cop: formData.plan_id ? formData.custom_price_cop : null,
         account_status: formData.account_status,
         is_courtesy: formData.is_courtesy,
         joined_at: formData.joined_at,
@@ -129,6 +150,8 @@ export default function EditarClientePage() {
   }
 
   const paymentStatus = getPaymentStatus()
+  const selectedPlan = plans.find((plan) => plan.id === formData.plan_id)
+  const planPriceValue = formData.custom_price_cop ?? selectedPlan?.price_cop ?? ''
 
   return (
     <div>
@@ -245,9 +268,7 @@ export default function EditarClientePage() {
               <Label>Plan de entrenamiento</Label>
               <Select
                 value={formData.plan_id || 'sin_plan'}
-                onValueChange={(value) =>
-                  updateField('plan_id', value === 'sin_plan' ? null : value)
-                }
+                onValueChange={updatePlan}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -261,6 +282,28 @@ export default function EditarClientePage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Precio aplicado al miembro (COP)</Label>
+              <Input
+                type="number"
+                min="0"
+                step="1000"
+                inputMode="numeric"
+                value={planPriceValue}
+                disabled={!formData.plan_id}
+                placeholder="Selecciona un plan"
+                onChange={(e) => {
+                  const value = e.target.value
+                  updateField('custom_price_cop', value === '' ? null : Number(value))
+                }}
+              />
+              {selectedPlan && (
+                <p className="text-xs text-gray-500">
+                  Precio base del plan: ${selectedPlan.price_cop.toLocaleString('es-CO')} COP
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">

@@ -93,6 +93,10 @@ export default function PerfilPage() {
     }).format(amount)
   }
 
+  function getEffectivePrice() {
+    return user?.custom_price_cop ?? plan?.price_cop ?? 0
+  }
+
   if (loading) {
     return <p className="text-gray-500">Cargando perfil...</p>
   }
@@ -163,7 +167,7 @@ export default function PerfilPage() {
             {plan && (
               <ProfileField
                 label="Valor del plan"
-                value={formatPrice(plan.price_cop)}
+                value={formatPrice(getEffectivePrice())}
               />
             )}
 

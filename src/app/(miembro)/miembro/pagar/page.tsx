@@ -88,6 +88,10 @@ export default function PagarPage() {
     return nextDate.toISOString().split('T')[0]
   }
 
+  function getEffectivePrice() {
+    return user?.custom_price_cop ?? plan?.price_cop ?? 0
+  }
+
   // Abrir el widget de Wompi
   async function handlePay() {
     if (!user || !plan) return
@@ -100,7 +104,8 @@ export default function PagarPage() {
     setProcessing(true)
 
     const reference = generateReference()
-    const amountInCents = plan.price_cop * 100
+    const effectivePrice = getEffectivePrice()
+    const amountInCents = effectivePrice * 100
     const currency = 'COP'
 
     // Obtener la firma de integridad desde nuestro servidor
@@ -144,7 +149,7 @@ export default function PagarPage() {
         await supabase.from('payments').insert({
           user_id: user.id,
           plan_id: plan.id,
-          amount_cop: plan.price_cop,
+          amount_cop: effectivePrice,
           status: 'completed',
           payment_method: 'wompi',
           wompi_transaction_id: transaction.id,
@@ -239,6 +244,7 @@ export default function PagarPage() {
   }
 
   const paymentStatus = getPaymentStatus()
+  const effectivePrice = getEffectivePrice()
 
   return (
     <div>
@@ -304,7 +310,7 @@ export default function PagarPage() {
           </div>
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
             <span className="text-sm text-gray-500">Valor a pagar</span>
-            <span className="text-lg font-bold">{formatPrice(plan.price_cop)}</span>
+            <span className="text-lg font-bold">{formatPrice(effectivePrice)}</span>
           </div>
           <div className="flex justify-between items-center py-2 border-b border-gray-100">
             <span className="text-sm text-gray-500">Estado de pago</span>
@@ -326,7 +332,7 @@ export default function PagarPage() {
             onClick={handlePay}
             disabled={processing}
           >
-            {processing ? 'Procesando...' : `Pagar ${formatPrice(plan.price_cop)}`}
+            {processing ? 'Procesando...' : `Pagar ${formatPrice(effectivePrice)}`}
           </Button>
 
           <p className="text-xs text-gray-400 text-center mt-2">
