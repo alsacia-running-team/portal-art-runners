@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
+export const runtime = 'nodejs'
+
+const RESEND_EMAILS_URL = 'https://api.resend.com/emails'
 
 export async function POST(request: NextRequest) {
   try {
     const { email, firstName } = await request.json()
+    const resendApiKey = process.env.RESEND_API_KEY
 
     if (!email || !firstName) {
       return NextResponse.json(
@@ -13,10 +17,17 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const response = await fetch('https://api.resend.com/emails', {
+    if (!resendApiKey) {
+      return NextResponse.json(
+        { error: 'RESEND_API_KEY no está configurada en el entorno del servidor' },
+        { status: 500 }
+      )
+    }
+
+    const response = await fetch(RESEND_EMAILS_URL, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+        'Authorization': `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -54,9 +65,9 @@ export async function POST(request: NextRequest) {
     })
 
     if (!response.ok) {
-      const errorData = await response.json()
+      const errorData = await response.text()
       return NextResponse.json(
-        { error: 'Error al enviar el correo: ' + JSON.stringify(errorData) },
+        { error: 'Error al enviar el correo: ' + errorData },
         { status: 500 }
       )
     }
