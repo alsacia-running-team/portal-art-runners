@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { User, Plan } from '@/types/database'
 
-// Declarar el tipo del widget de Wompi para TypeScript
 declare global {
   interface Window {
     WidgetCheckout: new (config: Record<string, unknown>) => {
@@ -32,7 +31,6 @@ export default function PagarPage() {
     loadWompiScript()
   }, [])
 
-  // Cargar el script del widget de Wompi
   function loadWompiScript() {
     if (document.querySelector('script[src="https://checkout.wompi.co/widget.js"]')) return
     const script = document.createElement('script')
@@ -53,49 +51,41 @@ export default function PagarPage() {
 
     if (userData) {
       setUser(userData)
-
       if (userData.plan_id) {
         const { data: planData } = await supabase
           .from('plans')
           .select('*')
           .eq('id', userData.plan_id)
           .single()
-
         if (planData) setPlan(planData)
       }
     }
     setLoading(false)
   }
 
-  // Generar referencia única para la transacción
+  function getEffectivePrice() {
+    return user?.custom_price_cop ?? plan?.price_cop ?? 0
+  }
+
   function generateReference() {
     const timestamp = Date.now()
     const random = Math.random().toString(36).substring(2, 8).toUpperCase()
     return `ART-${timestamp}-${random}`
   }
 
-  // Calcular fecha del próximo pago según el plan
   function calculateNextPaymentDate(): string {
     const baseDate = user?.cutoff_date ? new Date(user.cutoff_date) : new Date()
     const nextDate = new Date(baseDate)
-
     if (plan?.frequency === 'trimestral') {
       nextDate.setMonth(nextDate.getMonth() + 3)
     } else {
       nextDate.setMonth(nextDate.getMonth() + 1)
     }
-
     return nextDate.toISOString().split('T')[0]
   }
 
-  function getEffectivePrice() {
-    return user?.custom_price_cop ?? plan?.price_cop ?? 0
-  }
-
-  // Abrir el widget de Wompi
   async function handlePay() {
     if (!user || !plan) return
-
     if (!window.WidgetCheckout) {
       alert('El sistema de pagos está cargando. Intenta de nuevo en unos segundos.')
       return
@@ -108,7 +98,6 @@ export default function PagarPage() {
     const amountInCents = effectivePrice * 100
     const currency = 'COP'
 
-    // Obtener la firma de integridad desde nuestro servidor
     const signatureResponse = await fetch('/api/payments/signature', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -124,9 +113,9 @@ export default function PagarPage() {
     }
 
     const checkout = new window.WidgetCheckout({
-      currency: currency,
-      amountInCents: amountInCents,
-      reference: reference,
+      currency,
+      amountInCents,
+      reference,
       publicKey: process.env.NEXT_PUBLIC_WOMPI_PUBLIC_KEY,
       'signature:integrity': signature,
       customerData: {
@@ -177,12 +166,10 @@ export default function PagarPage() {
     })
   }
 
-  // Calcular estado de pago actual
   function getPaymentStatus(): { label: string; isAlDia: boolean } {
     if (!user) return { label: 'Sin datos', isAlDia: false }
     if (user.is_courtesy) return { label: 'Al día (cortesía)', isAlDia: true }
     if (!user.next_payment_date) return { label: 'Pendiente', isAlDia: false }
-
     const today = new Date()
     const nextPayment = new Date(user.next_payment_date)
     if (today > nextPayment) return { label: 'Pendiente', isAlDia: false }
@@ -207,36 +194,52 @@ export default function PagarPage() {
   }
 
   if (loading) {
-    return <p className="text-gray-500">Cargando información de pago...</p>
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-400">Cargando información de pago...</p>
+      </div>
+    )
   }
 
-  // Si el usuario no tiene plan asignado
   if (!plan) {
     return (
       <div>
-        <h1 className="text-2xl font-bold mb-6">Realizar pago</h1>
-        <Card className="max-w-lg">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Realizar pago</h1>
+        <Card className="max-w-lg border-0 shadow-sm">
           <CardContent className="pt-6">
-            <p className="text-gray-500 text-center py-8">
-              Aún no tienes un plan asignado. Contacta al administrador para que te
-              asigne un plan de entrenamiento.
-            </p>
+            <div className="text-center py-8">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-alsacia-yellow-50 mb-4">
+                <svg className="w-7 h-7 text-alsacia-yellow-600" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                </svg>
+              </div>
+              <p className="text-gray-600">
+                Aún no tienes un plan asignado. Contacta al administrador para que te
+                asigne un plan de entrenamiento.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
     )
   }
 
-  // Si es cortesía, no necesita pagar
   if (user?.is_courtesy) {
     return (
       <div>
-        <h1 className="text-2xl font-bold mb-6">Realizar pago</h1>
-        <Card className="max-w-lg">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Realizar pago</h1>
+        <Card className="max-w-lg border-0 shadow-sm">
           <CardContent className="pt-6">
-            <p className="text-green-600 text-center py-8">
-              Tu cuenta está marcada como cortesía. No necesitas realizar pagos.
-            </p>
+            <div className="text-center py-8">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-alsacia-cyan-50 mb-4">
+                <svg className="w-7 h-7 text-alsacia-cyan-600" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-gray-600">
+                Tu cuenta está marcada como cortesía. No necesitas realizar pagos.
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -248,47 +251,65 @@ export default function PagarPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Realizar pago</h1>
+      <div className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Realizar pago</h1>
+        <p className="text-gray-500 mt-1">Paga tu plan de entrenamiento de forma segura</p>
+      </div>
 
       {/* Resultado del pago */}
       {paymentResult.status && (
-        <Card className={`max-w-lg mb-6 ${
+        <Card className={`max-w-lg mb-6 border-0 shadow-sm ${
           paymentResult.status === 'success'
-            ? 'border-green-200 bg-green-50'
+            ? 'bg-gradient-to-r from-alsacia-cyan-50 to-alsacia-cyan-100'
             : paymentResult.status === 'pending'
-            ? 'border-amber-200 bg-amber-50'
-            : 'border-red-200 bg-red-50'
+            ? 'bg-gradient-to-r from-alsacia-yellow-50 to-alsacia-yellow-100'
+            : 'bg-gradient-to-r from-alsacia-pink-50 to-alsacia-pink-100'
         }`}>
           <CardContent className="pt-6 text-center">
             {paymentResult.status === 'success' && (
               <>
-                <p className="text-green-700 text-lg font-semibold mb-2">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-alsacia-cyan-200 mb-4">
+                  <svg className="w-7 h-7 text-alsacia-cyan-700" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <p className="text-alsacia-blue-800 text-lg font-semibold mb-2">
                   ¡Pago realizado con éxito!
                 </p>
-                <p className="text-green-600 text-sm">
-                  ID de transacción: {paymentResult.transactionId}
+                <p className="text-alsacia-blue-600 text-sm">
+                  ID: {paymentResult.transactionId}
                 </p>
-                <p className="text-green-600 text-sm mt-1">
-                  Tu próximo pago es el {formatDate(calculateNextPaymentDate())}
+                <p className="text-alsacia-blue-600 text-sm mt-1">
+                  Próximo pago: {formatDate(calculateNextPaymentDate())}
                 </p>
               </>
             )}
             {paymentResult.status === 'pending' && (
               <>
-                <p className="text-amber-700 text-lg font-semibold mb-2">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-alsacia-yellow-200 mb-4">
+                  <svg className="w-7 h-7 text-alsacia-yellow-700" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-alsacia-yellow-800 text-lg font-semibold mb-2">
                   Pago en proceso
                 </p>
-                <p className="text-amber-600 text-sm">
+                <p className="text-alsacia-yellow-700 text-sm">
                   Tu pago está siendo procesado. Puede tomar unos minutos.
                 </p>
               </>
             )}
             {paymentResult.status === 'failed' && (
               <>
-                <p className="text-red-700 text-lg font-semibold mb-2">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-alsacia-pink-200 mb-4">
+                  <svg className="w-7 h-7 text-alsacia-pink-700" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </div>
+                <p className="text-alsacia-pink-800 text-lg font-semibold mb-2">
                   Pago no completado
                 </p>
-                <p className="text-red-600 text-sm">
+                <p className="text-alsacia-pink-700 text-sm">
                   Hubo un problema con tu pago. Intenta de nuevo o usa otro método.
                 </p>
               </>
@@ -298,45 +319,48 @@ export default function PagarPage() {
       )}
 
       {/* Resumen del pago */}
-      <Card className="max-w-lg">
+      <Card className="max-w-lg border-0 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">Resumen</CardTitle>
+          <CardTitle className="text-lg text-alsacia-blue-500">Resumen</CardTitle>
           <CardDescription>Revisa los datos antes de pagar</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+        <CardContent className="space-y-1">
+          <div className="flex justify-between items-center py-3 border-b border-gray-100">
             <span className="text-sm text-gray-500">Plan</span>
-            <span className="text-sm font-medium">{plan.name} ({plan.frequency})</span>
+            <span className="text-sm font-medium text-gray-900">{plan.name} ({plan.frequency})</span>
           </div>
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+          <div className="flex justify-between items-center py-3 border-b border-gray-100">
             <span className="text-sm text-gray-500">Valor a pagar</span>
-            <span className="text-lg font-bold">{formatPrice(effectivePrice)}</span>
+            <span className="text-xl font-bold text-alsacia-blue-700">{formatPrice(effectivePrice)}</span>
           </div>
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+          <div className="flex justify-between items-center py-3 border-b border-gray-100">
             <span className="text-sm text-gray-500">Estado de pago</span>
-            <Badge
-              variant={paymentStatus.isAlDia ? 'default' : 'destructive'}
-              className={paymentStatus.isAlDia ? 'bg-green-600' : ''}
-            >
+            <Badge className={`${
+              paymentStatus.isAlDia
+                ? 'bg-alsacia-cyan-500 hover:bg-alsacia-cyan-500 text-white'
+                : 'bg-alsacia-pink-500 hover:bg-alsacia-pink-500 text-white'
+            }`}>
               {paymentStatus.label}
             </Badge>
           </div>
-          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+          <div className="flex justify-between items-center py-3">
             <span className="text-sm text-gray-500">Próximo pago</span>
-            <span className="text-sm font-medium">{formatDate(user?.next_payment_date ?? null)}</span>
+            <span className="text-sm font-medium text-gray-900">{formatDate(user?.next_payment_date ?? null)}</span>
           </div>
 
-          <Button
-            className="w-full mt-4"
-            size="lg"
-            onClick={handlePay}
-            disabled={processing}
-          >
-            {processing ? 'Procesando...' : `Pagar ${formatPrice(effectivePrice)}`}
-          </Button>
+          <div className="pt-4">
+            <Button
+              className="w-full h-12 bg-alsacia-blue-500 hover:bg-alsacia-blue-600 text-white font-semibold text-base"
+              size="lg"
+              onClick={handlePay}
+              disabled={processing}
+            >
+              {processing ? 'Procesando...' : `Pagar ${formatPrice(effectivePrice)}`}
+            </Button>
+          </div>
 
-          <p className="text-xs text-gray-400 text-center mt-2">
-            Serás redirigido a Wompi para completar el pago de forma segura.
+          <p className="text-xs text-gray-400 text-center pt-3">
+            Pago procesado de forma segura por Wompi.
             Puedes pagar con tarjeta, PSE, Nequi y más.
           </p>
         </CardContent>
