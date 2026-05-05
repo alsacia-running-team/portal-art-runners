@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-mono);
-  --font-heading: var(--font-mono);
+  --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -46,6 +46,58 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* ========================================
+     Colores de marca — Alsacia Running Team
+     ======================================== */
+
+  /* Azul Alsacia (principal) */
+  --color-alsacia-blue-50: #e6f0f8;
+  --color-alsacia-blue-100: #b3d1ea;
+  --color-alsacia-blue-200: #80b2dc;
+  --color-alsacia-blue-300: #4d93ce;
+  --color-alsacia-blue-400: #1a74c0;
+  --color-alsacia-blue-500: #035591;
+  --color-alsacia-blue-600: #024a7e;
+  --color-alsacia-blue-700: #023f6b;
+  --color-alsacia-blue-800: #013458;
+  --color-alsacia-blue-900: #012945;
+
+  /* Turquesa / Cyan */
+  --color-alsacia-cyan-50: #e6fdfb;
+  --color-alsacia-cyan-100: #b3f9f2;
+  --color-alsacia-cyan-200: #80f5e9;
+  --color-alsacia-cyan-300: #4df1e0;
+  --color-alsacia-cyan-400: #2ff2e1;
+  --color-alsacia-cyan-500: #1ad9c8;
+  --color-alsacia-cyan-600: #13b3a5;
+  --color-alsacia-cyan-700: #0d8d82;
+  --color-alsacia-cyan-800: #08675f;
+  --color-alsacia-cyan-900: #04413c;
+
+  /* Amarillo dorado */
+  --color-alsacia-yellow-50: #fef9e3;
+  --color-alsacia-yellow-100: #fcedb3;
+  --color-alsacia-yellow-200: #fae183;
+  --color-alsacia-yellow-300: #f8d553;
+  --color-alsacia-yellow-400: #f8d110;
+  --color-alsacia-yellow-500: #dfbb0e;
+  --color-alsacia-yellow-600: #b8990b;
+  --color-alsacia-yellow-700: #917709;
+  --color-alsacia-yellow-800: #6a5706;
+  --color-alsacia-yellow-900: #433703;
+
+  /* Rosa / Magenta */
+  --color-alsacia-pink-50: #fde7ee;
+  --color-alsacia-pink-100: #f9b5cb;
+  --color-alsacia-pink-200: #f583a8;
+  --color-alsacia-pink-300: #f15185;
+  --color-alsacia-pink-400: #ed155e;
+  --color-alsacia-pink-500: #d41254;
+  --color-alsacia-pink-600: #af0f45;
+  --color-alsacia-pink-700: #8a0c37;
+  --color-alsacia-pink-800: #650829;
+  --color-alsacia-pink-900: #40051a;
 }
 
 :root {
@@ -55,8 +107,8 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.38 0.12 245);
+  --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -66,21 +118,21 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
+  --ring: oklch(0.38 0.12 245);
+  --chart-1: oklch(0.38 0.12 245);
+  --chart-2: oklch(0.82 0.14 175);
+  --chart-3: oklch(0.88 0.15 95);
+  --chart-4: oklch(0.62 0.22 350);
   --chart-5: oklch(0.269 0 0);
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar: oklch(0.25 0.08 245);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.82 0.14 175);
+  --sidebar-primary-foreground: oklch(0.15 0.06 245);
+  --sidebar-accent: oklch(0.30 0.08 245);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.35 0.06 245);
+  --sidebar-ring: oklch(0.82 0.14 175);
 }
 
 .dark {
@@ -90,8 +142,8 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(0.82 0.14 175);
+  --primary-foreground: oklch(0.15 0.06 245);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
@@ -101,15 +153,15 @@
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
+  --ring: oklch(0.82 0.14 175);
+  --chart-1: oklch(0.38 0.12 245);
+  --chart-2: oklch(0.82 0.14 175);
+  --chart-3: oklch(0.88 0.15 95);
+  --chart-4: oklch(0.62 0.22 350);
   --chart-5: oklch(0.269 0 0);
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary: oklch(0.82 0.14 175);
   --sidebar-primary-foreground: oklch(0.985 0 0);
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
@@ -125,6 +177,6 @@
     @apply bg-background text-foreground;
   }
   html {
-    @apply font-mono;
+    @apply font-sans;
   }
 }

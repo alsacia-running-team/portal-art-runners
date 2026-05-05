@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -22,7 +22,6 @@ export default function LoginPage() {
     setError('')
     setLoading(true)
 
-    // 1. Intentar iniciar sesión con Supabase Auth
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -34,7 +33,6 @@ export default function LoginPage() {
       return
     }
 
-    // 2. Buscar el usuario en nuestra tabla users
     const { data: userData, error: userError } = await supabase
       .from('users')
       .select('role, account_status')
@@ -47,7 +45,6 @@ export default function LoginPage() {
       return
     }
 
-    // 3. Verificar si la cuenta está aprobada
     if (userData.account_status === 'pending') {
       setError('Tu cuenta aún no ha sido aprobada. Espera la confirmación por correo.')
       await supabase.auth.signOut()
@@ -55,11 +52,6 @@ export default function LoginPage() {
       return
     }
 
-    if (userData.account_status === 'suspended') {
-      // Los suspendidos pueden entrar pero ven su estado
-    }
-
-    // 4. Redirigir según el rol
     if (userData.role === 'admin') {
       router.push('/admin/dashboard')
     } else {
@@ -68,78 +60,124 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">
-            Alsacia Running Team
-          </CardTitle>
-          <CardDescription>
-            Ingresa a tu cuenta
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4">
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* Lado visual — imagen y branding */}
+      <div className="relative lg:w-1/2 bg-alsacia-blue-700 overflow-hidden min-h-[320px] lg:min-h-screen">
+        {/* Imagen de fondo del equipo */}
+        <div className="absolute inset-0">
+          <Image
+            src="/images/runner-hero.png"
+            alt="Equipo Alsacia Running"
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="(min-width: 1024px) 50vw, 100vw"
+          />
+        </div>
+
+        {/* Overlay azul para legibilidad */}
+        <div className="absolute inset-0 bg-gradient-to-br from-alsacia-blue-900/50 via-alsacia-blue-700/35 to-alsacia-blue-900/65" />
+
+        {/* Contenido sobre la imagen */}
+        <div className="relative z-10 flex flex-col justify-center items-center h-full p-8 lg:p-16 text-white text-center min-h-[320px] lg:min-h-screen">
+          <div className="mb-8 w-full max-w-[340px] lg:max-w-[520px]">
+            <Image
+              src="/images/logo.png"
+              alt="Alsacia Running Team"
+              width={3427}
+              height={841}
+              className="mx-auto h-auto w-full mix-blend-screen"
+              priority
+            />
+          </div>
+          <h1 className="text-2xl lg:text-4xl font-bold mb-3 tracking-tight">
+            Bienvenido, runner
+          </h1>
+          <p className="text-base lg:text-lg text-alsacia-cyan-200 max-w-md">
+            Accede a tu cuenta para gestionar tu plan de entrenamiento y tus pagos.
+          </p>
+        </div>
+      </div>
+
+      {/* Lado del formulario */}
+      <div className="lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white">
+        <div className="w-full max-w-md">
+          <div className="mb-8">
+            <h2 className="text-2xl lg:text-3xl font-bold text-alsacia-blue-500 mb-2">
+              Iniciar sesión
+            </h2>
+            <p className="text-gray-500">
+              Ingresa tus credenciales para continuar
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Correo electrónico</Label>
+              <Label htmlFor="email" className="text-gray-700 font-medium">
+                Correo electrónico
+              </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="tucorreo@ejemplo.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500"
                 required
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password" className="text-gray-700 font-medium">
+                Contraseña
+              </Label>
               <Input
                 id="password"
                 type="password"
                 placeholder="Tu contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500"
                 required
               />
+              <div className="text-right">
+                <Link
+                  href="/recuperar-clave"
+                  className="text-sm text-alsacia-blue-500 hover:text-alsacia-blue-700 font-medium"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-200">
+              <div className="bg-alsacia-pink-50 text-alsacia-pink-700 text-sm p-4 rounded-lg border border-alsacia-pink-200">
                 {error}
               </div>
             )}
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full h-12 bg-alsacia-blue-500 hover:bg-alsacia-blue-600 text-white font-semibold text-base"
               disabled={loading}
             >
               {loading ? 'Ingresando...' : 'Ingresar'}
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm space-y-2">
-            <p>
-              <Link
-                href="/recuperar-clave"
-                className="text-blue-600 hover:underline"
-              >
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </p>
-            <p className="text-gray-500">
-              ¿No tienes cuenta?{' '}
+          <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+            <p className="text-gray-500 text-sm">
+              ¿Aún no eres parte del equipo?{' '}
               <Link
                 href="/registro"
-                className="text-blue-600 hover:underline"
-              >
-                Regístrate aquí
+                className="text-alsacia-blue-500 hover:text-alsacia-blue-700 font-semibold"
+              ><br></br>
+                Únete ahora
               </Link>
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }
