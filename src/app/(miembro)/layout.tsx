@@ -1,16 +1,49 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 const menuItems = [
-  { label: 'Mi perfil', href: '/miembro/perfil' },
-  { label: 'Editar datos', href: '/miembro/editar' },
-  { label: 'Realizar pago', href: '/miembro/pagar' },
-  { label: 'Historial de pagos', href: '/miembro/pagos' },
+  {
+    label: 'Mi perfil',
+    href: '/miembro/perfil',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Editar datos',
+    href: '/miembro/editar',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Realizar pago',
+    href: '/miembro/pagar',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+      </svg>
+    ),
+  },
+  {
+    label: 'Historial de pagos',
+    href: '/miembro/pagos',
+    icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+  },
 ]
 
 export default function MiembroLayout({
@@ -31,11 +64,19 @@ export default function MiembroLayout({
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
       {/* Header móvil */}
-      <header className="md:hidden bg-gray-900 text-white p-4 flex items-center justify-between">
-        <h2 className="text-lg font-bold">Alsacia Running</h2>
+      <header className="md:hidden bg-alsacia-blue-800 text-white p-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/images/logo.png"
+            alt="Alsacia"
+            width={120}
+            height={30}
+            className="h-7 w-auto mix-blend-screen"
+          />
+        </div>
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="p-2 rounded-md hover:bg-gray-800 transition-colors"
+          className="p-2 rounded-md hover:bg-alsacia-blue-700 transition-colors"
           aria-label="Abrir menú"
         >
           {menuOpen ? (
@@ -55,24 +96,25 @@ export default function MiembroLayout({
 
       {/* Menú móvil desplegable */}
       {menuOpen && (
-        <nav className="md:hidden bg-gray-900 text-white px-4 pb-4 space-y-2">
+        <nav className="md:hidden bg-alsacia-blue-800 text-white px-4 pb-4 space-y-1">
           {menuItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
               onClick={() => setMenuOpen(false)}
-              className={`block px-4 py-2 rounded-md text-sm transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
                 pathname === item.href
-                  ? 'bg-white text-gray-900 font-medium'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-alsacia-cyan-400 text-alsacia-blue-900 font-semibold'
+                  : 'text-alsacia-blue-100 hover:bg-alsacia-blue-700'
               }`}
             >
+              {item.icon}
               {item.label}
             </Link>
           ))}
           <Button
             variant="outline"
-            className="w-full mt-2 border-gray-600 text-gray-900 hover:bg-gray-800 hover:text-white"
+            className="w-full mt-3 border-alsacia-blue-600 text-alsacia-blue-100 hover:bg-alsacia-blue-700 hover:text-white"
             onClick={handleLogout}
           >
             Cerrar sesión
@@ -81,21 +123,32 @@ export default function MiembroLayout({
       )}
 
       {/* Menú lateral escritorio */}
-      <aside className="hidden md:flex w-64 bg-gray-900 text-white p-6 flex-col">
-        <h2 className="text-lg font-bold mb-1">Alsacia Running</h2>
-        <p className="text-sm text-gray-400 mb-8">Portal del miembro</p>
+      <aside className="hidden md:flex w-64 bg-alsacia-blue-800 text-white p-6 flex-col">
+        <div className="mb-8">
+          <Image
+            src="/images/logo.png"
+            alt="Alsacia Running Team"
+            width={200}
+            height={50}
+            className="h-10 w-auto mix-blend-screen mb-3"
+          />
+          <p className="text-xs text-alsacia-blue-300 uppercase tracking-wider font-semibold">
+            Portal del miembro
+          </p>
+        </div>
 
-        <nav className="space-y-2 flex-1">
+        <nav className="space-y-1 flex-1">
           {menuItems.map((item) => (
             <Link
               key={item.href}
               href={item.href}
-              className={`block px-4 py-2 rounded-md text-sm transition-colors ${
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${
                 pathname === item.href
-                  ? 'bg-white text-gray-900 font-medium'
-                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                  ? 'bg-alsacia-cyan-400 text-alsacia-blue-900 font-semibold'
+                  : 'text-alsacia-blue-100 hover:bg-alsacia-blue-700'
               }`}
             >
+              {item.icon}
               {item.label}
             </Link>
           ))}
@@ -103,7 +156,7 @@ export default function MiembroLayout({
 
         <Button
           variant="outline"
-          className="mt-4 border-gray-600 text-gray-900 hover:bg-gray-800 hover:text-white"
+          className="mt-4 border-alsacia-blue-600 text-alsacia-blue-100 hover:bg-alsacia-blue-700 hover:text-white"
           onClick={handleLogout}
         >
           Cerrar sesión
