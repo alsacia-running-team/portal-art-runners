@@ -42,9 +42,7 @@ export default function EditarClientePage() {
       .eq('id', clientId)
       .single()
 
-    if (!error && data) {
-      setFormData(data)
-    }
+    if (!error && data) setFormData(data)
     setLoading(false)
   }
 
@@ -53,7 +51,6 @@ export default function EditarClientePage() {
       .from('plans')
       .select('*')
       .eq('is_active', true)
-
     if (data) setPlans(data)
   }
 
@@ -116,19 +113,12 @@ export default function EditarClientePage() {
     setSaving(false)
   }
 
-  // Calcular estado de pago
   function getPaymentStatus(): { label: string; isAlDia: boolean } {
-    if (formData.is_courtesy) {
-      return { label: 'Al día (cortesía)', isAlDia: true }
-    }
-    if (!formData.next_payment_date) {
-      return { label: 'Pendiente', isAlDia: false }
-    }
+    if (formData.is_courtesy) return { label: 'Al día (cortesía)', isAlDia: true }
+    if (!formData.next_payment_date) return { label: 'Pendiente', isAlDia: false }
     const today = new Date()
     const nextPayment = new Date(formData.next_payment_date)
-    if (today > nextPayment) {
-      return { label: 'Pendiente', isAlDia: false }
-    }
+    if (today > nextPayment) return { label: 'Pendiente', isAlDia: false }
     return { label: 'Al día', isAlDia: true }
   }
 
@@ -142,11 +132,19 @@ export default function EditarClientePage() {
   }
 
   if (loading) {
-    return <p className="text-gray-500">Cargando datos del cliente...</p>
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-400">Cargando datos del cliente...</p>
+      </div>
+    )
   }
 
   if (!formData.id) {
-    return <p className="text-red-500">No se encontró el cliente.</p>
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-alsacia-pink-500">No se encontró el cliente.</p>
+      </div>
+    )
   }
 
   const paymentStatus = getPaymentStatus()
@@ -155,72 +153,84 @@ export default function EditarClientePage() {
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-6">
-        <Button variant="outline" onClick={() => router.push('/admin/clientes')}>
+      <div className="flex items-center gap-4 mb-8">
+        <Button
+          variant="outline"
+          className="text-alsacia-blue-500 border-alsacia-blue-200 hover:bg-alsacia-blue-50"
+          onClick={() => router.push('/admin/clientes')}
+        >
           ← Volver
         </Button>
-        <h1 className="text-2xl font-bold">
-          Editar: {formData.first_name} {formData.last_name}
-        </h1>
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+            {formData.first_name} {formData.last_name}
+          </h1>
+          <p className="text-gray-500 mt-1">Editar información del cliente</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Datos personales */}
-        <Card>
+        <Card className="border-0 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg">Datos personales</CardTitle>
+            <CardTitle className="text-lg text-alsacia-blue-500">Datos personales</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Nombres</Label>
+                <Label className="text-gray-700 font-medium">Nombres</Label>
                 <Input
                   value={formData.first_name || ''}
                   onChange={(e) => updateField('first_name', e.target.value)}
+                  className="h-11 border-gray-200"
                 />
               </div>
               <div className="space-y-2">
-                <Label>Apellidos</Label>
+                <Label className="text-gray-700 font-medium">Apellidos</Label>
                 <Input
                   value={formData.last_name || ''}
                   onChange={(e) => updateField('last_name', e.target.value)}
+                  className="h-11 border-gray-200"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>Identificación</Label>
+              <Label className="text-gray-700 font-medium">Identificación</Label>
               <Input
                 value={formData.identification || ''}
                 onChange={(e) => updateField('identification', e.target.value)}
+                className="h-11 border-gray-200"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Correo electrónico</Label>
+              <Label className="text-gray-700 font-medium">Correo electrónico</Label>
               <Input
                 type="email"
                 value={formData.email || ''}
                 onChange={(e) => updateField('email', e.target.value)}
+                className="h-11 border-gray-200"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Teléfono</Label>
+              <Label className="text-gray-700 font-medium">Teléfono</Label>
               <Input
                 value={formData.phone || ''}
                 onChange={(e) => updateField('phone', e.target.value)}
+                className="h-11 border-gray-200"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Género</Label>
+                <Label className="text-gray-700 font-medium">Género</Label>
                 <Select
                   value={formData.gender || ''}
                   onValueChange={(value) => updateField('gender', value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-11 border-gray-200">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -231,11 +241,12 @@ export default function EditarClientePage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Fecha de nacimiento</Label>
+                <Label className="text-gray-700 font-medium">Fecha de nacimiento</Label>
                 <Input
                   type="date"
                   value={formData.birth_date || ''}
                   onChange={(e) => updateField('birth_date', e.target.value)}
+                  className="h-11 border-gray-200"
                 />
               </div>
             </div>
@@ -243,18 +254,18 @@ export default function EditarClientePage() {
         </Card>
 
         {/* Datos de gestión */}
-        <Card>
+        <Card className="border-0 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-lg">Datos de cuenta</CardTitle>
+            <CardTitle className="text-lg text-alsacia-blue-500">Datos de cuenta</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5">
             <div className="space-y-2">
-              <Label>Estado de cuenta</Label>
+              <Label className="text-gray-700 font-medium">Estado de cuenta</Label>
               <Select
                 value={formData.account_status || ''}
                 onValueChange={(value) => updateField('account_status', value)}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-11 border-gray-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -265,12 +276,12 @@ export default function EditarClientePage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Plan de entrenamiento</Label>
+              <Label className="text-gray-700 font-medium">Plan de entrenamiento</Label>
               <Select
                 value={formData.plan_id || 'sin_plan'}
                 onValueChange={updatePlan}
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-11 border-gray-200">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -285,7 +296,7 @@ export default function EditarClientePage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Precio aplicado al miembro (COP)</Label>
+              <Label className="text-gray-700 font-medium">Precio aplicado al miembro (COP)</Label>
               <Input
                 type="number"
                 min="0"
@@ -294,6 +305,7 @@ export default function EditarClientePage() {
                 value={planPriceValue}
                 disabled={!formData.plan_id}
                 placeholder="Selecciona un plan"
+                className="h-11 border-gray-200"
                 onChange={(e) => {
                   const value = e.target.value
                   updateField('custom_price_cop', value === '' ? null : Number(value))
@@ -307,62 +319,66 @@ export default function EditarClientePage() {
             </div>
 
             <div className="space-y-2">
-              <Label>Fecha de ingreso</Label>
+              <Label className="text-gray-700 font-medium">Fecha de ingreso</Label>
               <Input
                 type="date"
                 value={formData.joined_at || ''}
                 onChange={(e) => updateField('joined_at', e.target.value)}
+                className="h-11 border-gray-200"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Fecha de corte</Label>
+              <Label className="text-gray-700 font-medium">Fecha de corte</Label>
               <Input
                 type="date"
                 value={formData.cutoff_date || ''}
                 onChange={(e) => updateField('cutoff_date', e.target.value)}
+                className="h-11 border-gray-200"
               />
             </div>
 
             <div className="space-y-2">
-              <Label>Próximo pago</Label>
+              <Label className="text-gray-700 font-medium">Próximo pago</Label>
               <Input
                 type="date"
                 value={formData.next_payment_date || ''}
                 onChange={(e) => updateField('next_payment_date', e.target.value)}
+                className="h-11 border-gray-200"
               />
             </div>
 
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <div className="flex justify-between items-center py-3 border-b border-gray-100">
               <span className="text-sm text-gray-500">Último pago</span>
-              <span className="text-sm font-medium">
-                {formatDate(formData.last_payment_date)}
-              </span>
+              <span className="text-sm font-medium">{formatDate(formData.last_payment_date)}</span>
             </div>
 
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <div className="flex justify-between items-center py-3 border-b border-gray-100">
               <span className="text-sm text-gray-500">Estado de pago</span>
-              <Badge
-                variant={paymentStatus.isAlDia ? 'default' : 'destructive'}
-                className={paymentStatus.isAlDia ? 'bg-green-600' : ''}
-              >
+              <Badge className={`text-xs ${
+                paymentStatus.isAlDia
+                  ? 'bg-alsacia-cyan-100 text-alsacia-cyan-700 hover:bg-alsacia-cyan-100'
+                  : 'bg-alsacia-yellow-100 text-alsacia-yellow-700 hover:bg-alsacia-yellow-100'
+              }`}>
                 {paymentStatus.label}
               </Badge>
             </div>
 
-            {/* Campo oculto para el cliente: Cortesía */}
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-4">
+            {/* Campo cortesía */}
+            <div className="bg-alsacia-yellow-50 border border-alsacia-yellow-200 rounded-lg p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-amber-800">Cortesía</p>
-                  <p className="text-xs text-amber-600">
+                  <p className="text-sm font-semibold text-alsacia-yellow-800">Cortesía</p>
+                  <p className="text-xs text-alsacia-yellow-600">
                     Campo visible solo para el administrador
                   </p>
                 </div>
                 <Button
                   size="sm"
-                  variant={formData.is_courtesy ? 'default' : 'outline'}
-                  className={formData.is_courtesy ? 'bg-amber-600 hover:bg-amber-700' : ''}
+                  className={formData.is_courtesy
+                    ? 'bg-alsacia-yellow-500 hover:bg-alsacia-yellow-600 text-white'
+                    : 'bg-white border border-alsacia-yellow-300 text-alsacia-yellow-700 hover:bg-alsacia-yellow-50'
+                  }
                   onClick={() => updateField('is_courtesy', !formData.is_courtesy)}
                 >
                   {formData.is_courtesy ? 'Sí' : 'No'}
@@ -373,20 +389,24 @@ export default function EditarClientePage() {
         </Card>
       </div>
 
-      {/* Mensajes y botón guardar */}
-      <div className="mt-6 flex items-center gap-4">
-        <Button onClick={handleSave} disabled={saving}>
+      {/* Botón guardar y mensajes */}
+      <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">
+        <Button
+          className="h-12 px-8 bg-alsacia-blue-500 hover:bg-alsacia-blue-600 text-white font-semibold"
+          onClick={handleSave}
+          disabled={saving}
+        >
           {saving ? 'Guardando...' : 'Guardar cambios'}
         </Button>
 
         {success && (
-          <span className="text-green-600 text-sm font-medium">
-            ✓ Cambios guardados correctamente
+          <span className="text-alsacia-cyan-700 text-sm font-medium bg-alsacia-cyan-50 px-4 py-2 rounded-lg">
+            Cambios guardados correctamente
           </span>
         )}
 
         {error && (
-          <span className="text-red-600 text-sm font-medium">
+          <span className="text-alsacia-pink-700 text-sm font-medium bg-alsacia-pink-50 px-4 py-2 rounded-lg">
             {error}
           </span>
         )}
