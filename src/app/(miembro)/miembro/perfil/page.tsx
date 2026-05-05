@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import Link from 'next/link'
 import type { User, Plan } from '@/types/database'
 
 export default function PerfilPage() {
@@ -17,12 +19,9 @@ export default function PerfilPage() {
   }, [])
 
   async function loadProfile() {
-    // 1. Obtener el usuario autenticado
     const { data: { user: authUser } } = await supabase.auth.getUser()
-
     if (!authUser) return
 
-    // 2. Traer sus datos de nuestra tabla users
     const { data: userData } = await supabase
       .from('users')
       .select('*')
@@ -32,7 +31,6 @@ export default function PerfilPage() {
     if (userData) {
       setUser(userData)
 
-      // 3. Si tiene plan asignado, traer los datos del plan
       if (userData.plan_id) {
         const { data: planData } = await supabase
           .from('plans')
@@ -40,41 +38,28 @@ export default function PerfilPage() {
           .eq('id', userData.plan_id)
           .single()
 
-        if (planData) {
-          setPlan(planData)
-        }
+        if (planData) setPlan(planData)
       }
     }
-
     setLoading(false)
   }
 
-  // Calcular el estado de pago (no se guarda en BD, se calcula en tiempo real)
-  function getPaymentStatus(): { label: string; variant: 'success' | 'warning' } {
-    if (!user) return { label: 'Sin datos', variant: 'warning' }
+  function getPaymentStatus(): { label: string; isAlDia: boolean } {
+    if (!user) return { label: 'Sin datos', isAlDia: false }
+    if (user.is_courtesy) return { label: 'Al día (cortesía)', isAlDia: true }
+    if (!user.next_payment_date) return { label: 'Pendiente', isAlDia: false }
 
-    // Si es cortesía, siempre está al día
-    if (user.is_courtesy) {
-      return { label: 'Al día', variant: 'success' }
-    }
-
-    // Si no tiene fecha de próximo pago, está pendiente
-    if (!user.next_payment_date) {
-      return { label: 'Pendiente', variant: 'warning' }
-    }
-
-    // Comparar fecha actual con fecha de próximo pago
     const today = new Date()
     const nextPayment = new Date(user.next_payment_date)
-
-    if (today > nextPayment) {
-      return { label: 'Pendiente', variant: 'warning' }
-    }
-
-    return { label: 'Al día', variant: 'success' }
+    return today > nextPayment
+      ? { label: 'Pendiente', isAlDia: false }
+      : { label: 'Al día', isAlDia: true }
   }
 
-  // Formatear fecha legible
+  function getEffectivePrice() {
+    return user?.custom_price_cop ?? plan?.price_cop ?? 0
+  }
+
   function formatDate(dateString: string | null) {
     if (!dateString) return 'No registrada'
     return new Date(dateString).toLocaleDateString('es-CO', {
@@ -84,7 +69,6 @@ export default function PerfilPage() {
     })
   }
 
-  // Formatear precio en pesos colombianos
   function formatPrice(amount: number) {
     return new Intl.NumberFormat('es-CO', {
       style: 'currency',
@@ -93,31 +77,92 @@ export default function PerfilPage() {
     }).format(amount)
   }
 
-  function getEffectivePrice() {
-    return user?.custom_price_cop ?? plan?.price_cop ?? 0
-  }
-
   if (loading) {
-    return <p className="text-gray-500">Cargando perfil...</p>
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-400">Cargando perfil...</p>
+      </div>
+    )
   }
 
   if (!user) {
-    return <p className="text-red-500">No se pudo cargar tu perfil.</p>
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-alsacia-pink-500">No se pudo cargar tu perfil.</p>
+      </div>
+    )
   }
 
   const paymentStatus = getPaymentStatus()
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Mi perfil</h1>
+      {/* Header del perfil con saludo */}
+      <div className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+          Hola, {user.first_name}
+        </h1>
+        <p className="text-gray-500 mt-1">
+          Aquí puedes ver tu información y el estado de tu cuenta.
+        </p>
+      </div>
+
+      {/* Tarjeta resumen de estado */}
+      <div className={`rounded-xl p-5 md:p-6 mb-6 ${
+        paymentStatus.isAlDia
+          ? 'bg-gradient-to-r from-alsacia-cyan-50 to-alsacia-cyan-100 border border-alsacia-cyan-200'
+          : 'bg-gradient-to-r from-alsacia-pink-50 to-alsacia-pink-100 border border-alsacia-pink-200'
+      }`}>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <Badge className={`text-sm px-3 py-1 ${
+                paymentStatus.isAlDia
+                  ? 'bg-alsacia-cyan-500 hover:bg-alsacia-cyan-500 text-white'
+                  : 'bg-alsacia-pink-500 hover:bg-alsacia-pink-500 text-white'
+              }`}>
+                {paymentStatus.label}
+              </Badge>
+              <Badge variant={user.account_status === 'approved' ? 'outline' : 'destructive'} className="text-sm">
+                {user.account_status === 'approved' ? 'Activo' : 'Suspendido'}
+              </Badge>
+            </div>
+            <p className="text-sm text-gray-600">
+              {plan
+                ? `${plan.name} (${plan.frequency}) — ${formatPrice(getEffectivePrice())}`
+                : 'Sin plan asignado'
+              }
+            </p>
+            {user.next_payment_date && (
+              <p className="text-sm text-gray-500 mt-1">
+                Próximo pago: {formatDate(user.next_payment_date)}
+              </p>
+            )}
+          </div>
+          {!user.is_courtesy && plan && (
+            <Link href="/miembro/pagar">
+              <Button className="bg-alsacia-blue-500 hover:bg-alsacia-blue-600 text-white font-semibold h-11 px-6">
+                {paymentStatus.isAlDia ? 'Realizar pago' : 'Pagar ahora'}
+              </Button>
+            </Link>
+          )}
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Datos personales */}
         <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Datos personales</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg text-alsacia-blue-500">
+              Datos personales
+            </CardTitle>
+            <Link href="/miembro/editar">
+              <Button variant="outline" size="sm" className="text-alsacia-blue-500 border-alsacia-blue-200 hover:bg-alsacia-blue-50">
+                Editar
+              </Button>
+            </Link>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-1">
             <ProfileField label="Nombres" value={user.first_name} />
             <ProfileField label="Apellidos" value={user.last_name} />
             <ProfileField label="Identificación" value={user.identification} />
@@ -134,43 +179,24 @@ export default function PerfilPage() {
           </CardContent>
         </Card>
 
-        {/* Datos de gestión */}
+        {/* Datos de cuenta */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Datos de mi cuenta</CardTitle>
+            <CardTitle className="text-lg text-alsacia-blue-500">
+              Datos de mi cuenta
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-500">Estado de cuenta</span>
-              <Badge
-                variant={user.account_status === 'approved' ? 'default' : 'destructive'}
-              >
-                {user.account_status === 'approved' ? 'Activo' : 'Suspendido'}
-              </Badge>
-            </div>
-
-            <div className="flex justify-between items-center py-2 border-b border-gray-100">
-              <span className="text-sm text-gray-500">Estado de pago</span>
-              <Badge
-                variant={paymentStatus.variant === 'success' ? 'default' : 'destructive'}
-                className={paymentStatus.variant === 'success' ? 'bg-green-600' : ''}
-              >
-                {paymentStatus.label}
-              </Badge>
-            </div>
-
+          <CardContent className="space-y-1">
             <ProfileField
               label="Plan de entrenamiento"
               value={plan ? `${plan.name} (${plan.frequency})` : 'Sin plan asignado'}
             />
-
             {plan && (
               <ProfileField
                 label="Valor del plan"
                 value={formatPrice(getEffectivePrice())}
               />
             )}
-
             <ProfileField
               label="Fecha de ingreso"
               value={formatDate(user.joined_at)}
@@ -190,12 +216,11 @@ export default function PerfilPage() {
   )
 }
 
-// Componente reutilizable para mostrar un campo con su etiqueta
 function ProfileField({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex justify-between items-center py-2 border-b border-gray-100">
+    <div className="flex justify-between items-center py-3 border-b border-gray-100 last:border-b-0">
       <span className="text-sm text-gray-500">{label}</span>
-      <span className="text-sm font-medium text-gray-900">{value}</span>
+      <span className="text-sm font-medium text-gray-900 text-right">{value}</span>
     </div>
   )
 }
