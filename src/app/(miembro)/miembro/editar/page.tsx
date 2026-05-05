@@ -73,55 +73,65 @@ export default function EditarDatosPage() {
   }
 
   if (loading) {
-    return <p className="text-gray-500">Cargando datos...</p>
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-gray-400">Cargando datos...</p>
+      </div>
+    )
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Editar mis datos</h1>
+      <div className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Editar mis datos</h1>
+        <p className="text-gray-500 mt-1">Actualiza tu información personal</p>
+      </div>
 
-      <Card className="max-w-lg">
+      <Card className="max-w-lg border-0 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">Datos personales</CardTitle>
+          <CardTitle className="text-lg text-alsacia-blue-500">Datos personales</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSave} className="space-y-4">
+          <form onSubmit={handleSave} className="space-y-5">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Nombres</Label>
+                <Label className="text-gray-700 font-medium">Nombres</Label>
                 <Input
                   value={formData.first_name || ''}
                   onChange={(e) => updateField('first_name', e.target.value)}
+                  className="h-12 border-gray-200"
                   required
                 />
               </div>
               <div className="space-y-2">
-                <Label>Apellidos</Label>
+                <Label className="text-gray-700 font-medium">Apellidos</Label>
                 <Input
                   value={formData.last_name || ''}
                   onChange={(e) => updateField('last_name', e.target.value)}
+                  className="h-12 border-gray-200"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label>Teléfono</Label>
+              <Label className="text-gray-700 font-medium">Teléfono</Label>
               <Input
                 value={formData.phone || ''}
                 onChange={(e) => updateField('phone', e.target.value)}
+                className="h-12 border-gray-200"
                 required
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Género</Label>
+                <Label className="text-gray-700 font-medium">Género</Label>
                 <Select
                   value={formData.gender || ''}
                   onValueChange={(value) => updateField('gender', value)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className="h-12 border-gray-200">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -132,46 +142,51 @@ export default function EditarDatosPage() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label>Fecha de nacimiento</Label>
+                <Label className="text-gray-700 font-medium">Fecha de nacimiento</Label>
                 <Input
                   type="date"
                   value={formData.birth_date || ''}
                   onChange={(e) => updateField('birth_date', e.target.value)}
+                  className="h-12 border-gray-200"
                   required
                 />
               </div>
             </div>
 
-            {/* Campos no editables por el miembro */}
+            {/* Campos no editables */}
             <div className="space-y-2">
-              <Label className="text-gray-400">Correo electrónico</Label>
-              <Input value={formData.email || ''} disabled />
+              <Label className="text-gray-400 font-medium">Correo electrónico</Label>
+              <Input value={formData.email || ''} disabled className="h-12 bg-gray-50" />
               <p className="text-xs text-gray-400">
                 El correo no se puede cambiar. Contacta al administrador.
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label className="text-gray-400">Identificación</Label>
-              <Input value={formData.identification || ''} disabled />
+              <Label className="text-gray-400 font-medium">Identificación</Label>
+              <Input value={formData.identification || ''} disabled className="h-12 bg-gray-50" />
               <p className="text-xs text-gray-400">
                 La identificación no se puede cambiar. Contacta al administrador.
               </p>
             </div>
 
             {error && (
-              <div className="bg-red-50 text-red-600 text-sm p-3 rounded-md border border-red-200">
+              <div className="bg-alsacia-pink-50 text-alsacia-pink-700 text-sm p-4 rounded-lg border border-alsacia-pink-200">
                 {error}
               </div>
             )}
 
             {success && (
-              <div className="bg-green-50 text-green-600 text-sm p-3 rounded-md border border-green-200">
-                ✓ Datos actualizados correctamente
+              <div className="bg-alsacia-cyan-50 text-alsacia-cyan-700 text-sm p-4 rounded-lg border border-alsacia-cyan-200">
+                Datos actualizados correctamente
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={saving}>
+            <Button
+              type="submit"
+              className="w-full h-12 bg-alsacia-blue-500 hover:bg-alsacia-blue-600 text-white font-semibold text-base"
+              disabled={saving}
+            >
               {saving ? 'Guardando...' : 'Guardar cambios'}
             </Button>
           </form>

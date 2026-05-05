@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
   Table,
   TableBody,
@@ -21,7 +20,6 @@ export default function SolicitudesPage() {
   const [approving, setApproving] = useState<string | null>(null)
   const supabase = createClient()
 
-  // Cargar solicitudes pendientes al abrir la página
   useEffect(() => {
     loadSolicitudes()
   }, [])
@@ -34,19 +32,15 @@ export default function SolicitudesPage() {
       .eq('account_status', 'pending')
       .order('created_at', { ascending: false })
 
-    if (!error && data) {
-      setSolicitudes(data)
-    }
+    if (!error && data) setSolicitudes(data)
     setLoading(false)
   }
 
-async function handleApprove(userId: string) {
+  async function handleApprove(userId: string) {
     setApproving(userId)
 
-    // Buscar datos del usuario para el email
     const userToApprove = solicitudes.find(s => s.id === userId)
 
-    // Actualizar el estado de la cuenta a 'approved'
     const { error } = await supabase
       .from('users')
       .update({
@@ -56,7 +50,6 @@ async function handleApprove(userId: string) {
       .eq('id', userId)
 
     if (!error) {
-      // Enviar email de aprobación
       if (userToApprove) {
         await fetch('/api/email/approve', {
           method: 'POST',
@@ -67,15 +60,12 @@ async function handleApprove(userId: string) {
           }),
         })
       }
-
-      // Quitar la solicitud de la lista
       setSolicitudes(prev => prev.filter(s => s.id !== userId))
     }
 
     setApproving(null)
   }
 
-  // Formatear fecha para mostrarla legible
   function formatDate(dateString: string) {
     return new Date(dateString).toLocaleDateString('es-CO', {
       year: 'numeric',
@@ -86,11 +76,14 @@ async function handleApprove(userId: string) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Solicitudes pendientes</h1>
+      <div className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Solicitudes</h1>
+        <p className="text-gray-500 mt-1">Aprueba las cuentas de nuevos miembros</p>
+      </div>
 
-      <Card>
+      <Card className="border-0 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">
+          <CardTitle className="text-lg text-alsacia-blue-500">
             {loading
               ? 'Cargando...'
               : `${solicitudes.length} solicitud${solicitudes.length !== 1 ? 'es' : ''} pendiente${solicitudes.length !== 1 ? 's' : ''}`
@@ -99,9 +92,14 @@ async function handleApprove(userId: string) {
         </CardHeader>
         <CardContent>
           {!loading && solicitudes.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              No hay solicitudes pendientes en este momento.
-            </p>
+            <div className="text-center py-12">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-alsacia-cyan-50 mb-4">
+                <svg className="w-7 h-7 text-alsacia-cyan-600" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <p className="text-gray-400">No hay solicitudes pendientes en este momento.</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
@@ -121,20 +119,18 @@ async function handleApprove(userId: string) {
                       <TableCell className="font-medium">
                         {solicitud.first_name} {solicitud.last_name}
                       </TableCell>
-                      <TableCell>{solicitud.email}</TableCell>
+                      <TableCell className="text-gray-500">{solicitud.email}</TableCell>
                       <TableCell>{solicitud.identification}</TableCell>
                       <TableCell>{solicitud.phone}</TableCell>
-                      <TableCell>{formatDate(solicitud.created_at)}</TableCell>
+                      <TableCell className="text-gray-500">{formatDate(solicitud.created_at)}</TableCell>
                       <TableCell>
                         <Button
                           size="sm"
+                          className="bg-alsacia-cyan-500 hover:bg-alsacia-cyan-600 text-white"
                           onClick={() => handleApprove(solicitud.id)}
                           disabled={approving === solicitud.id}
                         >
-                          {approving === solicitud.id
-                            ? 'Aprobando...'
-                            : 'Aprobar'
-                          }
+                          {approving === solicitud.id ? 'Aprobando...' : 'Aprobar'}
                         </Button>
                       </TableCell>
                     </TableRow>

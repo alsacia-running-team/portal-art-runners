@@ -29,7 +29,6 @@ export default function HistorialPagosPage() {
     const { data: { user: authUser } } = await supabase.auth.getUser()
     if (!authUser) return
 
-    // Primero obtener el id del usuario en nuestra tabla
     const { data: userData } = await supabase
       .from('users')
       .select('id')
@@ -38,16 +37,13 @@ export default function HistorialPagosPage() {
 
     if (!userData) return
 
-    // Traer los pagos con datos del plan
     const { data } = await supabase
       .from('payments')
       .select('*, plans(*)')
       .eq('user_id', userData.id)
       .order('created_at', { ascending: false })
 
-    if (data) {
-      setPayments(data as PaymentWithPlan[])
-    }
+    if (data) setPayments(data as PaymentWithPlan[])
     setLoading(false)
   }
 
@@ -71,23 +67,26 @@ export default function HistorialPagosPage() {
   function getStatusBadge(status: string) {
     switch (status) {
       case 'completed':
-        return <Badge className="bg-green-600">Completado</Badge>
+        return <Badge className="bg-alsacia-cyan-100 text-alsacia-cyan-700 hover:bg-alsacia-cyan-100 text-xs">Completado</Badge>
       case 'pending':
-        return <Badge variant="secondary">Pendiente</Badge>
+        return <Badge className="bg-alsacia-yellow-100 text-alsacia-yellow-700 hover:bg-alsacia-yellow-100 text-xs">Pendiente</Badge>
       case 'failed':
-        return <Badge variant="destructive">Fallido</Badge>
+        return <Badge className="bg-alsacia-pink-100 text-alsacia-pink-700 hover:bg-alsacia-pink-100 text-xs">Fallido</Badge>
       default:
-        return <Badge variant="secondary">{status}</Badge>
+        return <Badge variant="secondary" className="text-xs">{status}</Badge>
     }
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">Historial de pagos</h1>
+      <div className="mb-8">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Historial de pagos</h1>
+        <p className="text-gray-500 mt-1">Revisa todos tus pagos anteriores</p>
+      </div>
 
-      <Card>
+      <Card className="border-0 shadow-sm">
         <CardHeader>
-          <CardTitle className="text-lg">
+          <CardTitle className="text-lg text-alsacia-blue-500">
             {loading
               ? 'Cargando...'
               : `${payments.length} pago${payments.length !== 1 ? 's' : ''} registrado${payments.length !== 1 ? 's' : ''}`
@@ -96,9 +95,14 @@ export default function HistorialPagosPage() {
         </CardHeader>
         <CardContent>
           {!loading && payments.length === 0 ? (
-            <p className="text-gray-500 text-center py-8">
-              Aún no tienes pagos registrados.
-            </p>
+            <div className="text-center py-12">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gray-100 mb-4">
+                <svg className="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+                </svg>
+              </div>
+              <p className="text-gray-400">Aún no tienes pagos registrados.</p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <Table>
@@ -114,17 +118,17 @@ export default function HistorialPagosPage() {
                 <TableBody>
                   {payments.map((payment) => (
                     <TableRow key={payment.id}>
-                      <TableCell>{formatDate(payment.paid_at)}</TableCell>
-                      <TableCell>
+                      <TableCell className="font-medium">{formatDate(payment.paid_at)}</TableCell>
+                      <TableCell className="text-gray-500">
                         {payment.plans
                           ? `${payment.plans.name} (${payment.plans.frequency})`
                           : '—'
                         }
                       </TableCell>
-                      <TableCell className="text-sm text-gray-500">
+                      <TableCell className="text-sm text-gray-400">
                         {formatDate(payment.period_start)} — {formatDate(payment.period_end)}
                       </TableCell>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-semibold text-alsacia-blue-700">
                         {formatPrice(payment.amount_cop)}
                       </TableCell>
                       <TableCell>{getStatusBadge(payment.status)}</TableCell>
