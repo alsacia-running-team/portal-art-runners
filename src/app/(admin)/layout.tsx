@@ -63,6 +63,7 @@ export default function AdminLayout({
             width={120}
             height={30}
             className="h-7 w-auto mix-blend-screen"
+            priority
           />
         </div>
         <button
@@ -122,6 +123,7 @@ export default function AdminLayout({
             width={200}
             height={50}
             className="h-10 w-auto mix-blend-screen mb-3"
+            priority
           />
           <p className="text-xs text-alsacia-blue-300 uppercase tracking-wider font-semibold">
             Panel de administración
