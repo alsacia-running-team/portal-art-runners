@@ -1,12 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+
+type RecoveryStatus = 'checking' | 'valid' | 'invalid'
 
 export default function ActualizarClavePage() {
   const [password, setPassword] = useState('')
@@ -14,8 +15,25 @@ export default function ActualizarClavePage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [recoveryStatus, setRecoveryStatus] = useState<RecoveryStatus>('checking')
   const router = useRouter()
-  const supabase = createClient()
+
+  useEffect(() => {
+    async function validateRecoverySession() {
+      try {
+        const response = await fetch('/api/auth/recovery-status', {
+          cache: 'no-store',
+        })
+        const data = await response.json()
+
+        setRecoveryStatus(data.valid ? 'valid' : 'invalid')
+      } catch {
+        setRecoveryStatus('invalid')
+      }
+    }
+
+    validateRecoverySession()
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -34,15 +52,20 @@ export default function ActualizarClavePage() {
       return
     }
 
-    const { error: updateError } = await supabase.auth.updateUser({ password })
+    const response = await fetch('/api/auth/update-password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password }),
+    })
 
-    if (updateError) {
-      setError('Error al actualizar la contraseña: ' + updateError.message)
+    const data = await response.json()
+
+    if (!response.ok) {
+      setError(data.error ?? 'Error al actualizar la contraseña')
     } else {
-      await supabase.auth.signOut()
       setSuccess(true)
-      // Limpiar la URL para invalidar el código de recuperación
-      window.history.replaceState({}, '', '/actualizar-clave')
       setTimeout(() => router.replace('/login'), 3000)
     }
 
@@ -81,7 +104,37 @@ export default function ActualizarClavePage() {
       {/* Lado del formulario */}
       <div className="lg:w-1/2 flex items-center justify-center p-6 lg:p-12 bg-white">
         <div className="w-full max-w-md">
-          {success ? (
+          {recoveryStatus === 'checking' ? (
+            <div className="text-center">
+              <h2 className="text-2xl lg:text-3xl font-bold text-alsacia-blue-500 mb-3">
+                Validando enlace
+              </h2>
+              <p className="text-gray-600">
+                Estamos verificando tu enlace de recuperación...
+              </p>
+            </div>
+          ) : recoveryStatus === 'invalid' ? (
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-alsacia-pink-50 mb-6">
+                <svg className="w-8 h-8 text-alsacia-pink-700" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl lg:text-3xl font-bold text-alsacia-blue-500 mb-3">
+                Enlace no válido
+              </h2>
+              <p className="text-gray-600 mb-8">
+                Este enlace de recuperación expiró o ya fue usado. Solicita uno nuevo para cambiar tu contraseña.
+              </p>
+              <Button
+                type="button"
+                onClick={() => router.replace('/recuperar-clave')}
+                className="w-full h-12 bg-alsacia-blue-500 hover:bg-alsacia-blue-600 text-white font-semibold text-base"
+              >
+                Solicitar nuevo enlace
+              </Button>
+            </div>
+          ) : success ? (
             <div className="text-center">
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-alsacia-cyan-100 mb-6">
                 <svg className="w-8 h-8 text-alsacia-cyan-700" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">

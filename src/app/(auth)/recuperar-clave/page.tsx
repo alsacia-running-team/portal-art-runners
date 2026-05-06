@@ -22,7 +22,7 @@ export default function RecuperarClavePage() {
 
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(
       email,
-      { redirectTo: `${window.location.origin}/actualizar-clave` }
+      { redirectTo: `${window.location.origin}/auth/callback?next=/actualizar-clave&type=recovery` }
     )
 
     if (resetError) {
