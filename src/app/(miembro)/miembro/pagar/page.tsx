@@ -24,24 +24,9 @@ export default function PagarPage() {
   const [paymentResult, setPaymentResult] = useState<{
     status: 'success' | 'failed' | 'pending' | null
     transactionId: string | null
-  }>({ status: null, transactionId: null })
+    nextPaymentDate: string | null
+  }>({ status: null, transactionId: null, nextPaymentDate: null })
   const supabase = createClient()
- 
-
-  useEffect(() => {
-    loadUserData()
-    loadWompiScript()
-  }, [])
-
-    // Verificar pago pendiente al volver de PSE
-// Verificar pago pendiente al volver de PSE
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search)
-    const pendingRef = params.get('ref')
-    if (pendingRef && user) {
-      verifyPendingPayment(pendingRef)
-    }
-  }, [user])
 
   function loadWompiScript() {
     if (document.querySelector('script[src="https://checkout.wompi.co/widget.js"]')) return
@@ -85,81 +70,68 @@ export default function PagarPage() {
     return `ART-${timestamp}-${random}`
   }
 
-  function calculateNextPaymentDate(): string {
-    // Si ya tiene próximo pago y está al día, extender desde esa fecha
-    // Si está pendiente o no tiene fecha, calcular desde hoy
-    const now = new Date()
-    let baseDate: Date
+  async function confirmPayment({
+    transactionId,
+    reference,
+  }: {
+    transactionId?: string | null
+    reference?: string | null
+  }) {
+    setProcessing(true)
 
-    if (user?.next_payment_date) {
-      const currentNext = new Date(user.next_payment_date)
-      // Si está al día (next_payment_date es futuro), extender desde ahí
-      // Si está pendiente (next_payment_date ya pasó), calcular desde hoy
-      baseDate = currentNext > now ? currentNext : now
-    } else {
-      baseDate = now
-    }
+    const response = await fetch('/api/payments/confirm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ transactionId, reference }),
+    })
+    const data = await response.json()
 
-    const nextDate = new Date(baseDate)
-    if (plan?.frequency === 'trimestral') {
-      nextDate.setMonth(nextDate.getMonth() + 3)
-    } else {
-      nextDate.setMonth(nextDate.getMonth() + 1)
-    }
-    return nextDate.toISOString().split('T')[0]
-  }
-
-  async function verifyPendingPayment(reference: string) {
-      setProcessing(true)
-
-      const response = await fetch(`/api/payments/verify?reference=${reference}`)
-      const data = await response.json()
-
-      if (data.status === 'APPROVED' && user && plan) {
-        const today = new Date().toISOString().split('T')[0]
-        const nextPaymentDate = calculateNextPaymentDate()
-
-        // Verificar que no se haya registrado ya
-        const { data: existingPayment } = await supabase
-          .from('payments')
-          .select('id')
-          .eq('wompi_transaction_id', data.transactionId)
-          .single()
-
-        if (!existingPayment) {
-          await supabase.from('payments').insert({
-            user_id: user.id,
-            plan_id: plan.id,
-            amount_cop: getEffectivePrice(),
-            status: 'completed',
-            payment_method: 'pse',
-            wompi_transaction_id: data.transactionId,
-            period_start: today,
-            period_end: nextPaymentDate,
-            paid_at: new Date().toISOString(),
-          })
-
-          await supabase
-            .from('users')
-            .update({
-              last_payment_date: today,
-              next_payment_date: nextPaymentDate,
-            })
-            .eq('id', user.id)
-        }
-
-      setPaymentResult({ status: 'success', transactionId: data.transactionId })
-    } else if (data.status === 'PENDING') {
-      setPaymentResult({ status: 'pending', transactionId: data.transactionId })
+    if (response.ok && data.status === 'APPROVED') {
+      setPaymentResult({
+        status: 'success',
+        transactionId: data.transactionId,
+        nextPaymentDate: data.nextPaymentDate,
+      })
+      await loadUserData()
+    } else if (response.ok && data.status === 'PENDING') {
+      setPaymentResult({
+        status: 'pending',
+        transactionId: data.transactionId,
+        nextPaymentDate: null,
+      })
     } else if (data.status && data.status !== 'NOT_FOUND') {
-      setPaymentResult({ status: 'failed', transactionId: data.transactionId })
+      setPaymentResult({
+        status: 'failed',
+        transactionId: data.transactionId,
+        nextPaymentDate: null,
+      })
+    } else if (data.error) {
+      setPaymentResult({ status: 'failed', transactionId: transactionId ?? null, nextPaymentDate: null })
     }
 
     setProcessing(false)
-    // Limpiar la URL para que no se verifique de nuevo
     window.history.replaceState({}, '', '/miembro/pagar')
   }
 
+  useEffect(() => {
+    void (async () => {
+      await loadUserData()
+    })()
+    loadWompiScript()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const transactionId = params.get('id')
+    const pendingRef = params.get('ref')
+    if ((transactionId || pendingRef) && user) {
+      void (async () => {
+        await confirmPayment({ transactionId, reference: pendingRef })
+      })()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user])
 
   async function handlePay() {
     if (!user || !plan) return
@@ -210,34 +182,11 @@ export default function PagarPage() {
       const transaction = result.transaction
 
       if (transaction.status === 'APPROVED') {
-        const today = new Date().toISOString().split('T')[0]
-        const nextPaymentDate = calculateNextPaymentDate()
-
-        await supabase.from('payments').insert({
-          user_id: user.id,
-          plan_id: plan.id,
-          amount_cop: effectivePrice,
-          status: 'completed',
-          payment_method: 'wompi',
-          wompi_transaction_id: transaction.id,
-          period_start: today,
-          period_end: nextPaymentDate,
-          paid_at: new Date().toISOString(),
-        })
-
-        await supabase
-          .from('users')
-          .update({
-            last_payment_date: today,
-            next_payment_date: nextPaymentDate,
-          })
-          .eq('id', user.id)
-
-        setPaymentResult({ status: 'success', transactionId: transaction.id })
+        await confirmPayment({ transactionId: transaction.id })
       } else if (transaction.status === 'PENDING') {
-        setPaymentResult({ status: 'pending', transactionId: transaction.id })
+        setPaymentResult({ status: 'pending', transactionId: transaction.id, nextPaymentDate: null })
       } else {
-        setPaymentResult({ status: 'failed', transactionId: transaction.id })
+        setPaymentResult({ status: 'failed', transactionId: transaction.id, nextPaymentDate: null })
       }
 
       setProcessing(false)
@@ -358,7 +307,7 @@ export default function PagarPage() {
                   ID: {paymentResult.transactionId}
                 </p>
                 <p className="text-alsacia-blue-600 text-sm mt-1">
-                  Próximo pago: {formatDate(calculateNextPaymentDate())}
+                  Próximo pago: {formatDate(paymentResult.nextPaymentDate)}
                 </p>
               </>
             )}
