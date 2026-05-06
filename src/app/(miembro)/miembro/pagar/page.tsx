@@ -6,8 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { User, Plan } from '@/types/database'
-import { useSearchParams } from 'next/navigation'
-export const dynamic = 'force-dynamic'
+
 
 declare global {
   interface Window {
@@ -27,7 +26,7 @@ export default function PagarPage() {
     transactionId: string | null
   }>({ status: null, transactionId: null })
   const supabase = createClient()
-  const searchParams = useSearchParams()
+ 
 
   useEffect(() => {
     loadUserData()
@@ -35,12 +34,14 @@ export default function PagarPage() {
   }, [])
 
     // Verificar pago pendiente al volver de PSE
+// Verificar pago pendiente al volver de PSE
   useEffect(() => {
-    const pendingRef = searchParams.get('ref')
+    const params = new URLSearchParams(window.location.search)
+    const pendingRef = params.get('ref')
     if (pendingRef && user) {
       verifyPendingPayment(pendingRef)
     }
-  }, [searchParams, user])
+  }, [user])
 
   function loadWompiScript() {
     if (document.querySelector('script[src="https://checkout.wompi.co/widget.js"]')) return
