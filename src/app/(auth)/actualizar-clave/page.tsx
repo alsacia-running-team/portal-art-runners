@@ -41,7 +41,9 @@ export default function ActualizarClavePage() {
     } else {
       await supabase.auth.signOut()
       setSuccess(true)
-      setTimeout(() => router.push('/login'), 3000)
+      // Limpiar la URL para invalidar el código de recuperación
+      window.history.replaceState({}, '', '/actualizar-clave')
+      setTimeout(() => router.replace('/login'), 3000)
     }
 
     setLoading(false)
