@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { findPaymentIntentByReference } from '@/lib/payments/processing'
+import { getWompiTransaction } from '@/lib/payments/wompi'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,36 +18,46 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Consultar la transacción en Wompi por referencia
-    const wompiUrl = transactionId
-      ? `https://production.wompi.co/v1/transactions/${transactionId}`
-      : `https://production.wompi.co/v1/transactions?reference=${encodeURIComponent(reference!)}`
+    const supabase = await createClient()
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser()
 
-    const wompiResponse = await fetch(
-      wompiUrl,
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.WOMPI_PRIVATE_KEY}`,
-        },
-        cache: 'no-store',
-      }
-    )
-
-    if (!wompiResponse.ok) {
+    if (!authUser) {
       return NextResponse.json(
-        { error: 'Error al consultar Wompi' },
-        { status: 500 }
+        { error: 'Authentication required' },
+        { status: 401 }
       )
     }
 
-    const wompiData = await wompiResponse.json()
+    const transaction = await getWompiTransaction({ transactionId, reference })
 
-    if (!wompiData.data || (!transactionId && wompiData.data.length === 0)) {
+    if (!transaction) {
       return NextResponse.json({ status: 'NOT_FOUND' })
     }
 
-    // Tomar la transacción más reciente con esa referencia
-    const transaction = transactionId ? wompiData.data : wompiData.data[0]
+    const intent = await findPaymentIntentByReference(transaction.reference)
+
+    if (!intent) {
+      return NextResponse.json(
+        { error: 'Payment intent not found' },
+        { status: 404 }
+      )
+    }
+
+    const admin = createAdminClient()
+    const { data: user, error: userError } = await admin
+      .from('users')
+      .select('id')
+      .eq('auth_id', authUser.id)
+      .single()
+
+    if (userError || !user || intent.user_id !== user.id) {
+      return NextResponse.json(
+        { error: 'Payment does not belong to current user' },
+        { status: 403 }
+      )
+    }
 
     return NextResponse.json({
       status: transaction.status,

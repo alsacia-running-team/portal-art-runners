@@ -68,12 +68,6 @@ export default function PagarPage() {
     return user?.custom_price_cop ?? plan?.price_cop ?? 0
   }
 
-  function generateReference() {
-    const timestamp = Date.now()
-    const random = Math.random().toString(36).substring(2, 8).toUpperCase()
-    return `ART-${timestamp}-${random}`
-  }
-
   function wait(ms: number) {
     return new Promise((resolve) => window.setTimeout(resolve, ms))
   }
@@ -179,20 +173,20 @@ export default function PagarPage() {
 
     setProcessing(true)
 
-    const reference = generateReference()
-    const effectivePrice = getEffectivePrice()
-    const amountInCents = effectivePrice * 100
-    const currency = 'COP'
-
     const signatureResponse = await fetch('/api/payments/signature', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reference, amountInCents, currency }),
     })
 
-    const { signature, error: sigError } = await signatureResponse.json()
+    const {
+      signature,
+      reference,
+      amountInCents,
+      currency,
+      error: sigError,
+    } = await signatureResponse.json()
 
-    if (sigError || !signature) {
+    if (sigError || !signature || !reference || !amountInCents || !currency) {
       alert('Error al preparar el pago. Intenta de nuevo.')
       setProcessing(false)
       return

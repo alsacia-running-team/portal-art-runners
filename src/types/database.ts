@@ -43,3 +43,17 @@ export type Payment = {
   paid_at: string | null
   created_at: string
 }
+
+export type PaymentIntent = {
+  id: string
+  user_id: string
+  plan_id: string
+  reference: string
+  amount_in_cents: number
+  currency: string
+  status: 'created' | 'pending' | 'approved' | 'declined' | 'voided' | 'error'
+  wompi_transaction_id: string | null
+  expires_at: string
+  created_at: string
+  updated_at: string
+}
