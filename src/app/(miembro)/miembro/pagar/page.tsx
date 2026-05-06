@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { User, Plan } from '@/types/database'
+import { useSearchParams } from 'next/navigation'
 
 declare global {
   interface Window {
@@ -25,11 +26,20 @@ export default function PagarPage() {
     transactionId: string | null
   }>({ status: null, transactionId: null })
   const supabase = createClient()
+  const searchParams = useSearchParams()
 
   useEffect(() => {
     loadUserData()
     loadWompiScript()
   }, [])
+
+    // Verificar pago pendiente al volver de PSE
+  useEffect(() => {
+    const pendingRef = searchParams.get('ref')
+    if (pendingRef && user) {
+      verifyPendingPayment(pendingRef)
+    }
+  }, [searchParams, user])
 
   function loadWompiScript() {
     if (document.querySelector('script[src="https://checkout.wompi.co/widget.js"]')) return
@@ -97,6 +107,58 @@ export default function PagarPage() {
     return nextDate.toISOString().split('T')[0]
   }
 
+  async function verifyPendingPayment(reference: string) {
+      setProcessing(true)
+
+      const response = await fetch(`/api/payments/verify?reference=${reference}`)
+      const data = await response.json()
+
+      if (data.status === 'APPROVED' && user && plan) {
+        const today = new Date().toISOString().split('T')[0]
+        const nextPaymentDate = calculateNextPaymentDate()
+
+        // Verificar que no se haya registrado ya
+        const { data: existingPayment } = await supabase
+          .from('payments')
+          .select('id')
+          .eq('wompi_transaction_id', data.transactionId)
+          .single()
+
+        if (!existingPayment) {
+          await supabase.from('payments').insert({
+            user_id: user.id,
+            plan_id: plan.id,
+            amount_cop: getEffectivePrice(),
+            status: 'completed',
+            payment_method: 'pse',
+            wompi_transaction_id: data.transactionId,
+            period_start: today,
+            period_end: nextPaymentDate,
+            paid_at: new Date().toISOString(),
+          })
+
+          await supabase
+            .from('users')
+            .update({
+              last_payment_date: today,
+              next_payment_date: nextPaymentDate,
+            })
+            .eq('id', user.id)
+        }
+
+      setPaymentResult({ status: 'success', transactionId: data.transactionId })
+    } else if (data.status === 'PENDING') {
+      setPaymentResult({ status: 'pending', transactionId: data.transactionId })
+    } else if (data.status && data.status !== 'NOT_FOUND') {
+      setPaymentResult({ status: 'failed', transactionId: data.transactionId })
+    }
+
+    setProcessing(false)
+    // Limpiar la URL para que no se verifique de nuevo
+    window.history.replaceState({}, '', '/miembro/pagar')
+  }
+
+
   async function handlePay() {
     if (!user || !plan) return
     if (!window.WidgetCheckout) {
@@ -131,6 +193,7 @@ export default function PagarPage() {
       reference,
       publicKey: process.env.NEXT_PUBLIC_WOMPI_PUBLIC_KEY,
       'signature:integrity': signature,
+      redirectUrl: `${window.location.origin}/miembro/pagar?ref=${reference}`,
       customerData: {
         email: user.email,
         fullName: `${user.first_name} ${user.last_name}`,
