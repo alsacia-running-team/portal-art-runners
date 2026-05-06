@@ -16,6 +16,10 @@ declare global {
   }
 }
 
+const PAYMENT_POLL_INTERVAL_MS = 4000
+const PAYMENT_POLL_MAX_ATTEMPTS = 30
+const PENDING_PAYMENT_STATUSES = new Set(['PENDING'])
+
 export default function PagarPage() {
   const [user, setUser] = useState<User | null>(null)
   const [plan, setPlan] = useState<Plan | null>(null)
@@ -70,43 +74,72 @@ export default function PagarPage() {
     return `ART-${timestamp}-${random}`
   }
 
+  function wait(ms: number) {
+    return new Promise((resolve) => window.setTimeout(resolve, ms))
+  }
+
   async function confirmPayment({
     transactionId,
     reference,
+    pollUntilFinal = false,
   }: {
     transactionId?: string | null
     reference?: string | null
+    pollUntilFinal?: boolean
   }) {
     setProcessing(true)
 
-    const response = await fetch('/api/payments/confirm', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ transactionId, reference }),
-    })
-    const data = await response.json()
+    for (let attempt = 0; attempt < PAYMENT_POLL_MAX_ATTEMPTS; attempt += 1) {
+      const response = await fetch('/api/payments/confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactionId, reference }),
+      })
+      const data = await response.json()
 
-    if (response.ok && data.status === 'APPROVED') {
-      setPaymentResult({
-        status: 'success',
-        transactionId: data.transactionId,
-        nextPaymentDate: data.nextPaymentDate,
-      })
-      await loadUserData()
-    } else if (response.ok && data.status === 'PENDING') {
-      setPaymentResult({
-        status: 'pending',
-        transactionId: data.transactionId,
-        nextPaymentDate: null,
-      })
-    } else if (data.status && data.status !== 'NOT_FOUND') {
-      setPaymentResult({
-        status: 'failed',
-        transactionId: data.transactionId,
-        nextPaymentDate: null,
-      })
-    } else if (data.error) {
-      setPaymentResult({ status: 'failed', transactionId: transactionId ?? null, nextPaymentDate: null })
+      if (response.ok && data.status === 'APPROVED') {
+        setPaymentResult({
+          status: 'success',
+          transactionId: data.transactionId,
+          nextPaymentDate: data.nextPaymentDate,
+        })
+        await loadUserData()
+        setProcessing(false)
+        window.history.replaceState({}, '', '/miembro/pagar')
+        return
+      }
+
+      if (response.ok && PENDING_PAYMENT_STATUSES.has(data.status)) {
+        setPaymentResult({
+          status: 'pending',
+          transactionId: data.transactionId,
+          nextPaymentDate: null,
+        })
+
+        if (pollUntilFinal) {
+          await wait(PAYMENT_POLL_INTERVAL_MS)
+          continue
+        }
+
+        break
+      }
+
+      if (response.ok && data.status === 'NOT_FOUND' && pollUntilFinal) {
+        await wait(PAYMENT_POLL_INTERVAL_MS)
+        continue
+      }
+
+      if (data.status && data.status !== 'NOT_FOUND') {
+        setPaymentResult({
+          status: 'failed',
+          transactionId: data.transactionId,
+          nextPaymentDate: null,
+        })
+      } else if (data.error) {
+        setPaymentResult({ status: 'failed', transactionId: transactionId ?? null, nextPaymentDate: null })
+      }
+
+      break
     }
 
     setProcessing(false)
@@ -127,7 +160,11 @@ export default function PagarPage() {
     const pendingRef = params.get('ref')
     if ((transactionId || pendingRef) && user) {
       void (async () => {
-        await confirmPayment({ transactionId, reference: pendingRef })
+        await confirmPayment({
+          transactionId,
+          reference: pendingRef,
+          pollUntilFinal: true,
+        })
       })()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -184,7 +221,10 @@ export default function PagarPage() {
       if (transaction.status === 'APPROVED') {
         await confirmPayment({ transactionId: transaction.id })
       } else if (transaction.status === 'PENDING') {
-        setPaymentResult({ status: 'pending', transactionId: transaction.id, nextPaymentDate: null })
+        await confirmPayment({
+          transactionId: transaction.id,
+          pollUntilFinal: true,
+        })
       } else {
         setPaymentResult({ status: 'failed', transactionId: transaction.id, nextPaymentDate: null })
       }
