@@ -106,7 +106,7 @@ export default function AdminLayout({
           ))}
           <Button
             variant="outline"
-            className="w-full mt-3 border-alsacia-blue-600 text-alsacia-blue-100 hover:bg-alsacia-blue-700 hover:text-white"
+            className="w-full mt-3 border-alsacia-blue-300 bg-transparent text-white hover:bg-alsacia-blue-700 hover:text-white"
             onClick={handleLogout}
           >
             Cerrar sesión
@@ -149,7 +149,7 @@ export default function AdminLayout({
 
         <Button
           variant="outline"
-          className="mt-4 border-alsacia-blue-600 text-alsacia-blue-100 hover:bg-alsacia-blue-700 hover:text-white"
+          className="mt-4 border-alsacia-blue-300 bg-transparent text-white hover:bg-alsacia-blue-700 hover:text-white"
           onClick={handleLogout}
         >
           Cerrar sesión

@@ -358,7 +358,7 @@ export default function EditarClientePage() {
               <Badge className={`text-xs ${
                 paymentStatus.isAlDia
                   ? 'bg-alsacia-cyan-100 text-alsacia-cyan-700 hover:bg-alsacia-cyan-100'
-                  : 'bg-alsacia-yellow-100 text-alsacia-yellow-700 hover:bg-alsacia-yellow-100'
+                  : 'bg-alsacia-yellow-100 text-alsacia-yellow-900 hover:bg-alsacia-yellow-100 font-semibold'
               }`}>
                 {paymentStatus.label}
               </Badge>

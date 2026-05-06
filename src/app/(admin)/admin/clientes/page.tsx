@@ -243,7 +243,7 @@ export default function ClientesPage() {
                             className={`text-xs ${
                               paymentStatus === 'al_dia'
                                 ? 'bg-alsacia-cyan-100 text-alsacia-cyan-700 hover:bg-alsacia-cyan-100'
-                                : 'bg-alsacia-yellow-100 text-alsacia-yellow-700 hover:bg-alsacia-yellow-100'
+                                : 'bg-alsacia-yellow-100 text-alsacia-yellow-900 hover:bg-alsacia-yellow-100 font-semibold'
                             }`}
                           >
                             {paymentStatus === 'al_dia' ? 'Al día' : 'Pendiente'}
@@ -263,7 +263,7 @@ export default function ClientesPage() {
                               size="sm"
                               variant={client.account_status === 'approved' ? 'destructive' : 'default'}
                               className={client.account_status === 'approved'
-                                ? 'bg-alsacia-pink-500 hover:bg-alsacia-pink-600'
+                                ? 'bg-alsacia-pink-500 text-white hover:bg-alsacia-pink-600 hover:text-white'
                                 : 'bg-alsacia-cyan-500 hover:bg-alsacia-cyan-600'
                               }
                               onClick={() => handleToggleStatus(client)}
