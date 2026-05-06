@@ -46,7 +46,7 @@ export async function POST() {
       )
     }
 
-    if (user.is_courtesy || user.account_status !== 'approved' || !user.plan_id) {
+    if (user.is_courtesy || !user.plan_id) {
       return NextResponse.json(
         { error: 'User is not eligible for payments' },
         { status: 403 }
@@ -69,6 +69,13 @@ export async function POST() {
     const reference = generateReference()
     const amountInCents = (user.custom_price_cop ?? plan.price_cop) * 100
     const currency = 'COP'
+
+    if (!Number.isInteger(amountInCents) || amountInCents <= 0) {
+      return NextResponse.json(
+        { error: 'Invalid payment amount' },
+        { status: 422 }
+      )
+    }
 
     const { data: intent, error: intentError } = await admin
       .from('payment_intents')
