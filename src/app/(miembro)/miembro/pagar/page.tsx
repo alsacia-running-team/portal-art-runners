@@ -74,7 +74,20 @@ export default function PagarPage() {
   }
 
   function calculateNextPaymentDate(): string {
-    const baseDate = user?.cutoff_date ? new Date(user.cutoff_date) : new Date()
+    // Si ya tiene próximo pago y está al día, extender desde esa fecha
+    // Si está pendiente o no tiene fecha, calcular desde hoy
+    const now = new Date()
+    let baseDate: Date
+
+    if (user?.next_payment_date) {
+      const currentNext = new Date(user.next_payment_date)
+      // Si está al día (next_payment_date es futuro), extender desde ahí
+      // Si está pendiente (next_payment_date ya pasó), calcular desde hoy
+      baseDate = currentNext > now ? currentNext : now
+    } else {
+      baseDate = now
+    }
+
     const nextDate = new Date(baseDate)
     if (plan?.frequency === 'trimestral') {
       nextDate.setMonth(nextDate.getMonth() + 3)
