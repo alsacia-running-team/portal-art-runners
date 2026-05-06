@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { useRouter, usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { useProtectedSession } from '@/lib/auth/use-protected-session'
 
 const menuItems = [
   {
@@ -52,13 +53,13 @@ export default function MiembroLayout({
   children: React.ReactNode
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
+  useProtectedSession()
 
   async function handleLogout() {
     await supabase.auth.signOut()
-    router.push('/login')
+    window.location.replace('/login')
   }
 
   return (
