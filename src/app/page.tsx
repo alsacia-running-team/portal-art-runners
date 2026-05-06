@@ -22,12 +22,6 @@ export default function LandingPage() {
               >
                 Iniciar sesión
               </Link>
-              <Link
-                href="/registro"
-                className="text-sm bg-alsacia-cyan-400 text-alsacia-blue-900 font-semibold px-5 py-2 rounded-lg hover:bg-alsacia-cyan-300 transition-colors"
-              >
-                Únete al equipo
-              </Link>
             </div>
           </div>
         </div>
