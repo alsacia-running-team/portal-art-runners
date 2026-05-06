@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { User, Plan } from '@/types/database'
 import { useSearchParams } from 'next/navigation'
+export const dynamic = 'force-dynamic'
 
 declare global {
   interface Window {
