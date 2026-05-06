@@ -7,7 +7,7 @@ export default function LandingPage() {
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-alsacia-blue-900/90 backdrop-blur-md border-b border-alsacia-blue-700/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between min-h-16 py-2 sm:h-16 sm:py-0">
             <Image
               src="/images/logo.png"
               alt="Alsacia Running Team"
@@ -15,7 +15,7 @@ export default function LandingPage() {
               height={40}
               className="h-8 w-auto mix-blend-screen"
             />
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-center sm:gap-3">
               <Link
                 href="/login"
                 className="text-sm text-alsacia-blue-100 hover:text-white transition-colors font-medium px-4 py-2"
