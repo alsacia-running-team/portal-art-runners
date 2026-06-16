@@ -142,9 +142,9 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto items-stretch">
             {/* Plan Grupal */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow border border-gray-100">
+            <div className="flex flex-col bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow border border-gray-100">
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-alsacia-cyan-100 text-alsacia-cyan-600 mb-5">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
@@ -152,39 +152,61 @@ export default function LandingPage() {
               </div>
               <h3 className="text-2xl font-bold text-alsacia-blue-800 mb-2">Plan Grupal</h3>
               <p className="text-gray-600 mb-6">
-                Entrena en grupo con planes estructurados para todos los niveles.
+                Entrena en equipo, creces en comunidad.
               </p>
-              <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <svg className="w-5 h-5 text-alsacia-cyan-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Sesiones de entrenamiento grupales
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-start mb-8">
+                <div className="space-y-3">
+                  {[
+                    'Entrenamiento presencial guiado por entrenador',
+                    'Calendario de entrenamiento en TrainingPeaks',
+                    'Sesiones adaptadas a todos los niveles',
+                    'Feedback del entrenador en campo',
+                    'Ambiente de motivación y compañerismo',
+                    'Eventos exclusivos del equipo',
+                  ].map((feature) => (
+                    <div key={feature} className="flex items-start gap-2 text-sm text-gray-700">
+                      <svg className="w-5 h-5 text-alsacia-cyan-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      {feature}
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <svg className="w-5 h-5 text-alsacia-cyan-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Acceso a la comunidad del equipo
-                </div>
-                <div className="flex items-center gap-2 text-sm text-gray-700">
-                  <svg className="w-5 h-5 text-alsacia-cyan-500 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Pago mensual o trimestral
+                <div className="bg-alsacia-blue-50 rounded-xl p-5 space-y-4">
+                  <div>
+                    <div className="flex items-center gap-2 text-alsacia-blue-700 font-semibold mb-1">
+                      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Horarios
+                    </div>
+                    <p className="text-sm text-gray-600">Martes y jueves: 5 am y 7 pm</p>
+                    <p className="text-sm text-gray-600">Sábados: 7 am</p>
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 text-alsacia-blue-700 font-semibold mb-1">
+                      <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+                      </svg>
+                      Ubicación
+                    </div>
+                    <p className="text-sm text-gray-600">Cancha múltiple al lado de Clínica de La Paz</p>
+                    <p className="text-sm text-gray-600">Carrera 69 #12-75</p>
+                  </div>
                 </div>
               </div>
               <Link
                 href="/registro"
-                className="block text-center bg-alsacia-blue-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-alsacia-blue-600 transition-colors"
+                className="mt-auto block text-center bg-alsacia-blue-500 text-white font-semibold px-6 py-3 rounded-xl hover:bg-alsacia-blue-600 transition-colors"
               >
                 Empezar ahora
               </Link>
             </div>
 
             {/* Plan Personalizado */}
-            <div className="bg-alsacia-blue-800 rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow relative overflow-hidden">
-              <div className="absolute top-4 right-4">
+            <div className="flex flex-col bg-alsacia-blue-800 rounded-2xl p-8 shadow-sm hover:shadow-lg transition-shadow relative overflow-hidden">
+              <div className="absolute top-4 right-4 z-10">
                 <span className="bg-alsacia-yellow-400 text-alsacia-blue-900 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                   Popular
                 </span>
@@ -196,31 +218,28 @@ export default function LandingPage() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Plan Personalizado</h3>
               <p className="text-alsacia-blue-200 mb-6">
-                Entrenamiento exclusivo diseñado para tus objetivos específicos.
+                Un plan hecho para ti, para tus metas.
               </p>
               <div className="space-y-3 mb-8">
-                <div className="flex items-center gap-2 text-sm text-alsacia-blue-100">
-                  <svg className="w-5 h-5 text-alsacia-cyan-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Todo lo del plan grupal
-                </div>
-                <div className="flex items-center gap-2 text-sm text-alsacia-blue-100">
-                  <svg className="w-5 h-5 text-alsacia-cyan-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Plan de entrenamiento a tu medida
-                </div>
-                <div className="flex items-center gap-2 text-sm text-alsacia-blue-100">
-                  <svg className="w-5 h-5 text-alsacia-cyan-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Seguimiento personalizado del coach
-                </div>
+                {[
+                  'Plan de entrenamiento 100% personalizado',
+                  'Diseñado en TrainingPeaks',
+                  'Ajustes semanales según tu progreso',
+                  'Seguimiento y feedback del entrenador',
+                  'Ideal para objetivos específicos y competencias',
+                  'Incluye sesiones de running, fuerza y técnica',
+                ].map((feature) => (
+                  <div key={feature} className="flex items-start gap-2 text-sm text-alsacia-blue-100">
+                    <svg className="w-5 h-5 text-alsacia-cyan-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    {feature}
+                  </div>
+                ))}
               </div>
               <Link
                 href="/registro"
-                className="block text-center bg-alsacia-cyan-400 text-alsacia-blue-900 font-bold px-6 py-3 rounded-xl hover:bg-alsacia-cyan-300 transition-colors"
+                className="mt-auto block text-center bg-alsacia-cyan-400 text-alsacia-blue-900 font-bold px-6 py-3 rounded-xl hover:bg-alsacia-cyan-300 transition-colors"
               >
                 Empezar ahora
               </Link>
