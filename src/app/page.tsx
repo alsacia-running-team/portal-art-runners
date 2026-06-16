@@ -53,8 +53,8 @@ export default function LandingPage() {
             />
           </div>
           <p className="text-lg sm:text-xl md:text-2xl text-alsacia-cyan-200 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Entrena con nosotros y lleva tu rendimiento al siguiente nivel.
-            Más de 50 runners ya son parte del equipo.
+            Entrenamiento guiado para todos los niveles en ciudad Alsacia, Bogotá.
+            Entrena running en comunidad, cerca de tu casa.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
@@ -71,30 +71,6 @@ export default function LandingPage() {
             </Link>
           </div>
         </div>
-
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <svg className="w-6 h-6 text-white/50" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </div>
-      </section>
-
-      {/* Stats Bar */}
-      <section className="bg-alsacia-blue-800 py-8">
-        <div className="max-w-5xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          {[
-            { number: '30+', label: 'Runners activos' },
-            { number: '2', label: 'Planes de entrenamiento' },
-            { number: '5+', label: 'Años de experiencia' },
-            { number: '100%', label: 'Compromiso' },
-          ].map((stat) => (
-            <div key={stat.label}>
-              <p className="text-3xl md:text-4xl font-bold text-alsacia-cyan-400">{stat.number}</p>
-              <p className="text-sm text-alsacia-blue-200 mt-1">{stat.label}</p>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* Qué ofrecemos */}
@@ -105,15 +81,15 @@ export default function LandingPage() {
               Nuestros servicios
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-alsacia-blue-800">
-              ¿Qué te ofrecemos?
+              ¿Porque entrenar con Alsacia Running?
             </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
-                title: 'Entrenamiento grupal',
-                description: 'Sesiones de entrenamiento en grupo con planes estructurados para todos los niveles. Entrena con compañeros que te motivan.',
+                title: 'Comunidad real',
+                description: 'Entrena con vecinos y se parte de una comunidad que promueve una vida saludablea través del running.',
                 icon: (
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
@@ -121,8 +97,8 @@ export default function LandingPage() {
                 ),
               },
               {
-                title: 'Plan personalizado',
-                description: 'Entrenamiento adaptado a tus objetivos y nivel. Tu coach diseña un plan exclusivo para que alcances tus metas.',
+                title: 'Entrenamiento real',
+                description: 'Planes de entrenamiento estructurados y progresivos para todos los niveles, diseñados por tu entrenador para acompañarte en cada paso de tu proceso.',
                 icon: (
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
@@ -130,8 +106,8 @@ export default function LandingPage() {
                 ),
               },
               {
-                title: 'Seguimiento continuo',
-                description: 'Monitoreo de tu progreso, gestión de pagos y comunicación directa con tu entrenador a través de nuestra plataforma.',
+                title: 'Entrenador certificado',
+                description: 'Entrenador certificado por el Colegio Colombiano de Entrenamiento Deportivo COCED y por la International Sports Sciences Association ISSA. Tendrás acompañamiento profesional para que alcances tus metas.',
                 icon: (
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
@@ -273,15 +249,12 @@ export default function LandingPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             ¿Listo para correr con nosotros?
           </h2>
-          <p className="text-lg text-alsacia-blue-200 mb-10 max-w-xl mx-auto">
-            Únete a Alsacia Running Team y forma parte de una comunidad de runners comprometidos con mejorar cada día.
-          </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/registro"
               className="w-full sm:w-auto bg-alsacia-cyan-400 text-alsacia-blue-900 font-bold px-8 py-4 rounded-xl text-lg hover:bg-alsacia-cyan-300 transition-all hover:scale-105"
             >
-              Crear mi cuenta
+              Quiero unirme
             </Link>
             <Link
               href="/login"
