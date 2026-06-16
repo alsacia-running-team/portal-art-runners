@@ -13,11 +13,19 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { User } from '@/types/database'
+import {
+  interestedPlanLabel,
+  livesInAlsaciaLabel,
+  trainingLevelLabel,
+  trainingGoalLabel,
+  strengthTrainingLabel,
+} from '@/lib/registro-options'
 
 export default function SolicitudesPage() {
   const [solicitudes, setSolicitudes] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [approving, setApproving] = useState<string | null>(null)
+  const [error, setError] = useState('')
   const supabase = createClient()
 
   useEffect(() => {
@@ -38,29 +46,20 @@ export default function SolicitudesPage() {
 
   async function handleApprove(userId: string) {
     setApproving(userId)
+    setError('')
 
-    const userToApprove = solicitudes.find(s => s.id === userId)
+    const response = await fetch('/api/admin/approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId }),
+    })
 
-    const { error } = await supabase
-      .from('users')
-      .update({
-        account_status: 'approved',
-        joined_at: new Date().toISOString().split('T')[0],
-      })
-      .eq('id', userId)
+    const data = await response.json().catch(() => ({}))
 
-    if (!error) {
-      if (userToApprove) {
-        await fetch('/api/email/approve', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: userToApprove.email,
-            firstName: userToApprove.first_name,
-          }),
-        })
-      }
+    if (response.ok) {
       setSolicitudes(prev => prev.filter(s => s.id !== userId))
+    } else {
+      setError(data.error || 'No se pudo aprobar la solicitud. Intenta de nuevo.')
     }
 
     setApproving(null)
@@ -91,6 +90,11 @@ export default function SolicitudesPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {error && (
+            <div className="mb-4 bg-alsacia-pink-50 text-alsacia-pink-700 text-sm p-4 rounded-lg border border-alsacia-pink-200">
+              {error}
+            </div>
+          )}
           {!loading && solicitudes.length === 0 ? (
             <div className="text-center py-12">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-alsacia-cyan-50 mb-4">
@@ -107,8 +111,12 @@ export default function SolicitudesPage() {
                   <TableRow>
                     <TableHead>Nombre</TableHead>
                     <TableHead>Correo</TableHead>
-                    <TableHead>Identificación</TableHead>
                     <TableHead>Teléfono</TableHead>
+                    <TableHead>Plan de interés</TableHead>
+                    <TableHead>¿Vive en Alsacia?</TableHead>
+                    <TableHead>Nivel</TableHead>
+                    <TableHead>Objetivo</TableHead>
+                    <TableHead>Fuerza</TableHead>
                     <TableHead>Fecha solicitud</TableHead>
                     <TableHead>Acción</TableHead>
                   </TableRow>
@@ -116,13 +124,19 @@ export default function SolicitudesPage() {
                 <TableBody>
                   {solicitudes.map((solicitud) => (
                     <TableRow key={solicitud.id}>
-                      <TableCell className="font-medium">
+                      <TableCell className="font-medium whitespace-nowrap">
                         {solicitud.first_name} {solicitud.last_name}
                       </TableCell>
                       <TableCell className="text-gray-500">{solicitud.email}</TableCell>
-                      <TableCell>{solicitud.identification}</TableCell>
-                      <TableCell>{solicitud.phone}</TableCell>
-                      <TableCell className="text-gray-500">{formatDate(solicitud.created_at)}</TableCell>
+                      <TableCell className="whitespace-nowrap">{solicitud.phone}</TableCell>
+                      <TableCell className="whitespace-nowrap">{interestedPlanLabel(solicitud.interested_plan)}</TableCell>
+                      <TableCell>{livesInAlsaciaLabel(solicitud.lives_in_alsacia)}</TableCell>
+                      <TableCell title={trainingLevelLabel(solicitud.training_level)}>
+                        {solicitud.training_level ?? '—'}
+                      </TableCell>
+                      <TableCell className="max-w-[200px]">{trainingGoalLabel(solicitud.training_goal)}</TableCell>
+                      <TableCell className="whitespace-nowrap">{strengthTrainingLabel(solicitud.strength_training)}</TableCell>
+                      <TableCell className="text-gray-500 whitespace-nowrap">{formatDate(solicitud.created_at)}</TableCell>
                       <TableCell>
                         <Button
                           size="sm"

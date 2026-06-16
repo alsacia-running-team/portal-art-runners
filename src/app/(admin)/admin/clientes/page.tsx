@@ -108,7 +108,7 @@ export default function ClientesPage() {
       client.first_name.toLowerCase().includes(searchLower) ||
       client.last_name.toLowerCase().includes(searchLower) ||
       client.email.toLowerCase().includes(searchLower) ||
-      client.identification.includes(search)
+      (client.identification?.includes(search) ?? false)
 
     const matchesStatus =
       filterStatus === 'all' || client.account_status === filterStatus

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,23 +13,31 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import {
+  INTERESTED_PLANS,
+  LIVES_IN_ALSACIA_OPTIONS,
+  TRAINING_LEVELS,
+  TRAINING_GOALS,
+  STRENGTH_TRAINING_OPTIONS,
+} from '@/lib/registro-options'
 
 export default function RegistroPage() {
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
-    identification: '',
     email: '',
     phone: '',
     gender: '',
     birth_date: '',
-    password: '',
-    confirm_password: '',
+    interested_plan: '',
+    lives_in_alsacia: '',
+    training_level: '',
+    training_goal: '',
+    strength_training: '',
   })
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
 
   function updateField(field: string, value: string) {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -41,60 +48,20 @@ export default function RegistroPage() {
     setError('')
     setLoading(true)
 
-    if (formData.password !== formData.confirm_password) {
-      setError('Las contraseñas no coinciden')
-      setLoading(false)
-      return
-    }
-
-    if (formData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres')
-      setLoading(false)
-      return
-    }
-
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
     })
 
-    if (authError) {
-      if (authError.message.includes('already registered')) {
-        setError('Este correo ya está registrado')
-      } else {
-        setError('Error al crear la cuenta: ' + authError.message)
-      }
+    const data = await response.json()
+
+    if (!response.ok) {
+      setError(data.error || 'No se pudo enviar tu solicitud. Intenta de nuevo.')
       setLoading(false)
       return
     }
 
-    if (!authData.user) {
-      setError('Error inesperado al crear la cuenta')
-      setLoading(false)
-      return
-    }
-
-    const { error: dbError } = await supabase.from('users').insert({
-      auth_id: authData.user.id,
-      email: formData.email,
-      first_name: formData.first_name,
-      last_name: formData.last_name,
-      identification: formData.identification,
-      phone: formData.phone,
-      gender: formData.gender,
-      birth_date: formData.birth_date,
-      role: 'member',
-      account_status: 'pending',
-      is_courtesy: false,
-    })
-
-    if (dbError) {
-      setError('Error al guardar tus datos: ' + dbError.message)
-      setLoading(false)
-      return
-    }
-
-    await supabase.auth.signOut()
     setSuccess(true)
     setLoading(false)
   }
@@ -145,8 +112,8 @@ export default function RegistroPage() {
               ¡Solicitud enviada!
             </h2>
             <p className="text-gray-600 mb-8">
-              Tu registro fue exitoso. Recibirás un correo cuando el administrador
-              apruebe tu cuenta.
+              Tu solicitud fue enviada con éxito. Cuando el administrador la apruebe,
+              recibirás un correo con tu contraseña para ingresar al portal.
             </p>
             <Link href="/login">
               <Button className="w-full h-12 bg-alsacia-blue-500 hover:bg-alsacia-blue-600 text-white font-semibold text-base">
@@ -237,20 +204,6 @@ export default function RegistroPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="identification" className="text-gray-700 font-medium">
-                Número de identificación
-              </Label>
-              <Input
-                id="identification"
-                placeholder="Cédula de ciudadanía"
-                value={formData.identification}
-                onChange={(e) => updateField('identification', e.target.value)}
-                className="h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="email" className="text-gray-700 font-medium">
                 Correo electrónico
               </Label>
@@ -315,34 +268,124 @@ export default function RegistroPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700 font-medium">
-                  Contraseña
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Mínimo 6 caracteres"
-                  value={formData.password}
-                  onChange={(e) => updateField('password', e.target.value)}
-                  className="h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirm_password" className="text-gray-700 font-medium">
-                  Confirmar
-                </Label>
-                <Input
-                  id="confirm_password"
-                  type="password"
-                  placeholder="Repite la contraseña"
-                  value={formData.confirm_password}
-                  onChange={(e) => updateField('confirm_password', e.target.value)}
-                  className="h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500"
-                  required
-                />
+            <div className="pt-2 border-t border-gray-100">
+              <p className="text-sm font-semibold text-alsacia-blue-500 pt-4 mb-1">
+                Cuéntanos sobre ti
+              </p>
+              <p className="text-xs text-gray-400 mb-4">
+                Esto nos ayuda a ubicarte en el plan adecuado.
+              </p>
+
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">
+                    Plan que te interesa
+                  </Label>
+                  <Select
+                    value={formData.interested_plan}
+                    onValueChange={(value) => updateField('interested_plan', value)}
+                    required
+                  >
+                    <SelectTrigger className="h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500">
+                      <SelectValue placeholder="Selecciona un plan" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {INTERESTED_PLANS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">
+                    ¿Vives en el sector de Ciudad Alsacia, Bogotá o alrededores?
+                  </Label>
+                  <Select
+                    value={formData.lives_in_alsacia}
+                    onValueChange={(value) => updateField('lives_in_alsacia', value)}
+                    required
+                  >
+                    <SelectTrigger className="h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500">
+                      <SelectValue placeholder="Selecciona" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LIVES_IN_ALSACIA_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">
+                    Nivel de entrenamiento (atletismo, ciclismo)
+                  </Label>
+                  <Select
+                    value={formData.training_level}
+                    onValueChange={(value) => updateField('training_level', value)}
+                    required
+                  >
+                    <SelectTrigger className="h-auto min-h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500 whitespace-normal text-left">
+                      <SelectValue placeholder="Selecciona tu nivel" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TRAINING_LEVELS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">
+                    ¿Cuál es tu objetivo principal de entrenamiento en este momento?
+                  </Label>
+                  <Select
+                    value={formData.training_goal}
+                    onValueChange={(value) => updateField('training_goal', value)}
+                    required
+                  >
+                    <SelectTrigger className="h-auto min-h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500 whitespace-normal text-left">
+                      <SelectValue placeholder="Selecciona tu objetivo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {TRAINING_GOALS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">
+                    ¿Realizas actualmente entrenamiento de fuerza?
+                  </Label>
+                  <Select
+                    value={formData.strength_training}
+                    onValueChange={(value) => updateField('strength_training', value)}
+                    required
+                  >
+                    <SelectTrigger className="h-12 border-gray-200 focus:border-alsacia-blue-500 focus:ring-alsacia-blue-500">
+                      <SelectValue placeholder="Selecciona" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STRENGTH_TRAINING_OPTIONS.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
 
@@ -357,7 +400,7 @@ export default function RegistroPage() {
               className="w-full h-12 bg-alsacia-blue-500 hover:bg-alsacia-blue-600 text-white font-semibold text-base"
               disabled={loading}
             >
-              {loading ? 'Creando cuenta...' : 'Crear cuenta'}
+              {loading ? 'Enviando solicitud...' : 'Enviar solicitud'}
             </Button>
           </form>
 

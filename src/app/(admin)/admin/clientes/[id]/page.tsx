@@ -16,6 +16,13 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import type { User, Plan } from '@/types/database'
+import {
+  interestedPlanLabel,
+  livesInAlsaciaLabel,
+  trainingLevelLabel,
+  trainingGoalLabel,
+  strengthTrainingLabel,
+} from '@/lib/registro-options'
 
 export default function EditarClientePage() {
   const params = useParams()
@@ -388,6 +395,37 @@ export default function EditarClientePage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Información del cuestionario de registro */}
+      <Card className="border-0 shadow-sm mt-6">
+        <CardHeader>
+          <CardTitle className="text-lg text-alsacia-blue-500">Información de registro</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+            <div className="flex flex-col">
+              <dt className="text-xs text-gray-500">Plan de interés</dt>
+              <dd className="text-sm font-medium text-gray-900">{interestedPlanLabel(formData.interested_plan)}</dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-xs text-gray-500">¿Vive en Ciudad Alsacia o alrededores?</dt>
+              <dd className="text-sm font-medium text-gray-900">{livesInAlsaciaLabel(formData.lives_in_alsacia)}</dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-xs text-gray-500">Nivel de entrenamiento</dt>
+              <dd className="text-sm font-medium text-gray-900">{trainingLevelLabel(formData.training_level)}</dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-xs text-gray-500">Objetivo principal</dt>
+              <dd className="text-sm font-medium text-gray-900">{trainingGoalLabel(formData.training_goal)}</dd>
+            </div>
+            <div className="flex flex-col">
+              <dt className="text-xs text-gray-500">Entrenamiento de fuerza</dt>
+              <dd className="text-sm font-medium text-gray-900">{strengthTrainingLabel(formData.strength_training)}</dd>
+            </div>
+          </dl>
+        </CardContent>
+      </Card>
 
       {/* Botón guardar y mensajes */}
       <div className="mt-6 flex flex-col sm:flex-row items-start sm:items-center gap-4">

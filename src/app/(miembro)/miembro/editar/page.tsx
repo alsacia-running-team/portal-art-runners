@@ -17,6 +17,7 @@ import type { User } from '@/types/database'
 
 export default function EditarDatosPage() {
   const [formData, setFormData] = useState<Partial<User>>({})
+  const [idLocked, setIdLocked] = useState(true)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -37,7 +38,11 @@ export default function EditarDatosPage() {
       .eq('auth_id', authUser.id)
       .single()
 
-    if (data) setFormData(data)
+    if (data) {
+      setFormData(data)
+      // La identificación solo se puede ingresar una vez; luego queda bloqueada.
+      setIdLocked(Boolean(data.identification))
+    }
     setLoading(false)
   }
 
@@ -52,21 +57,33 @@ export default function EditarDatosPage() {
     setError('')
     setSuccess(false)
 
+    const updatePayload: Partial<User> = {
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      phone: formData.phone,
+      gender: formData.gender,
+      birth_date: formData.birth_date,
+    }
+
+    // Solo se envía la identificación la primera vez que se diligencia.
+    if (!idLocked) {
+      updatePayload.identification = (formData.identification || '').trim()
+    }
+
     const { error: updateError } = await supabase
       .from('users')
-      .update({
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        phone: formData.phone,
-        gender: formData.gender,
-        birth_date: formData.birth_date,
-      })
+      .update(updatePayload)
       .eq('id', formData.id)
 
     if (updateError) {
-      setError('Error al guardar: ' + updateError.message)
+      if (updateError.code === '23505') {
+        setError('Esa identificación ya está registrada por otro miembro.')
+      } else {
+        setError('Error al guardar: ' + updateError.message)
+      }
     } else {
       setSuccess(true)
+      if (!idLocked && updatePayload.identification) setIdLocked(true)
     }
 
     setSaving(false)
@@ -162,13 +179,34 @@ export default function EditarDatosPage() {
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-gray-400 font-medium">Identificación</Label>
-              <Input value={formData.identification || ''} disabled className="h-12 bg-gray-50" />
-              <p className="text-xs text-gray-400">
-                La identificación no se puede cambiar. Contacta al administrador.
-              </p>
-            </div>
+            {idLocked ? (
+              <div className="space-y-2">
+                <Label className="text-gray-400 font-medium">Identificación</Label>
+                <Input value={formData.identification || ''} disabled className="h-12 bg-gray-50" />
+                <p className="text-xs text-gray-400">
+                  La identificación no se puede cambiar. Contacta al administrador.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="identification" className="text-gray-700 font-medium">
+                  Número de identificación
+                </Label>
+                <Input
+                  id="identification"
+                  inputMode="numeric"
+                  placeholder="Cédula de ciudadanía"
+                  value={formData.identification || ''}
+                  onChange={(e) => updateField('identification', e.target.value)}
+                  className="h-12 border-gray-200"
+                  required
+                />
+                <p className="text-xs text-alsacia-yellow-700">
+                  Completa tu identificación para poder realizar pagos. Solo podrás
+                  ingresarla una vez; luego deberás contactar al administrador para cambiarla.
+                </p>
+              </div>
+            )}
 
             {error && (
               <div className="bg-alsacia-pink-50 text-alsacia-pink-700 text-sm p-4 rounded-lg border border-alsacia-pink-200">

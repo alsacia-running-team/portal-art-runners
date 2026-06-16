@@ -165,7 +165,7 @@ export default function PerfilPage() {
           <CardContent className="space-y-1">
             <ProfileField label="Nombres" value={user.first_name} />
             <ProfileField label="Apellidos" value={user.last_name} />
-            <ProfileField label="Identificación" value={user.identification} />
+            <ProfileField label="Identificación" value={user.identification || 'Pendiente por completar'} />
             <ProfileField label="Correo" value={user.email} />
             <ProfileField label="Teléfono" value={user.phone} />
             <ProfileField

@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -300,6 +301,34 @@ export default function PagarPage() {
               <p className="text-gray-600">
                 Tu cuenta está marcada como cortesía. No necesitas realizar pagos.
               </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (user && !user.identification) {
+    return (
+      <div>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Realizar pago</h1>
+        <Card className="max-w-lg border-0 shadow-sm">
+          <CardContent className="pt-6">
+            <div className="text-center py-8">
+              <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-alsacia-yellow-50 mb-4">
+                <svg className="w-7 h-7 text-alsacia-yellow-600" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </div>
+              <p className="text-gray-600 mb-6">
+                Para realizar pagos necesitas registrar tu número de identificación.
+                Complétalo en tus datos personales.
+              </p>
+              <Link href="/miembro/editar">
+                <Button className="h-11 px-6 bg-alsacia-blue-500 hover:bg-alsacia-blue-600 text-white font-semibold">
+                  Completar identificación
+                </Button>
+              </Link>
             </div>
           </CardContent>
         </Card>

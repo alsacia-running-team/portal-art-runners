@@ -9,11 +9,11 @@ export type Plan = {
 
 export type User = {
   id: string
-  auth_id: string
+  auth_id: string | null
   email: string
   first_name: string
   last_name: string
-  identification: string
+  identification: string | null
   phone: string
   gender: 'masculino' | 'femenino' | 'otro'
   birth_date: string
@@ -28,6 +28,12 @@ export type User = {
   last_payment_date: string | null
   next_payment_date: string | null
   created_at: string
+  // Cuestionario de registro
+  interested_plan: 'grupal' | 'personalizado' | null
+  lives_in_alsacia: boolean | null
+  training_level: 'A' | 'B' | 'C' | 'D' | null
+  training_goal: 'salud' | 'peso' | 'rendimiento' | 'social' | null
+  strength_training: 'no' | 'gimnasio' | 'casa' | null
 }
 
 export type Payment = {
