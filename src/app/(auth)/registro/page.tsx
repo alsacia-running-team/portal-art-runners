@@ -20,6 +20,7 @@ import {
   TRAINING_GOALS,
   STRENGTH_TRAINING_OPTIONS,
 } from '@/lib/registro-options'
+import { HomeLinkButton } from '@/components/auth-chrome'
 
 export default function RegistroPage() {
   const [formData, setFormData] = useState({
@@ -68,7 +69,9 @@ export default function RegistroPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex flex-col lg:flex-row">
+      <div className="relative min-h-screen flex flex-col lg:flex-row">
+        <HomeLinkButton />
+
         <div className="relative lg:w-1/2 bg-alsacia-blue-700 overflow-hidden min-h-[320px] lg:min-h-screen">
           <div className="absolute inset-0">
             <Image
@@ -127,7 +130,9 @@ export default function RegistroPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="relative min-h-screen flex flex-col lg:flex-row">
+      <HomeLinkButton />
+
       {/* Lado visual */}
       <div className="relative lg:w-1/2 bg-alsacia-blue-700 overflow-hidden min-h-[280px] lg:min-h-screen lg:sticky lg:top-0">
         <div className="absolute inset-0">
@@ -166,10 +171,10 @@ export default function RegistroPage() {
         <div className="w-full max-w-lg py-8">
           <div className="mb-8">
             <h2 className="text-2xl lg:text-3xl font-bold text-alsacia-blue-500 mb-2">
-              Crea tu cuenta
+              Registrate
             </h2>
             <p className="text-gray-500">
-              Completa tus datos para enviar tu solicitud
+              Completa tus datos para enviar tu solicitud, pronto serás contactado
             </p>
           </div>
 
@@ -220,7 +225,7 @@ export default function RegistroPage() {
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-gray-700 font-medium">
-                Teléfono
+                Whatsapp / Teléfono
               </Label>
               <Input
                 id="phone"

@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { HomeLinkButton } from '@/components/auth-chrome'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -60,7 +61,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="relative min-h-screen flex flex-col lg:flex-row">
+      <HomeLinkButton />
+
       {/* Lado visual — imagen y branding */}
       <div className="relative lg:w-1/2 bg-alsacia-blue-700 overflow-hidden min-h-[320px] lg:min-h-screen">
         {/* Imagen de fondo del equipo */}
@@ -171,7 +174,7 @@ export default function LoginPage() {
               <Link
                 href="/registro"
                 className="text-alsacia-blue-500 hover:text-alsacia-blue-700 font-semibold"
-              ><br></br>
+              >
                 Únete ahora
               </Link>
             </p>

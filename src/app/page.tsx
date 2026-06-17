@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { ContactSocials } from '@/components/contact-socials'
 
 export default function LandingPage() {
   return (
@@ -265,7 +266,7 @@ export default function LandingPage() {
           />
         </div>
         <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-12">
             ¿Listo para correr con nosotros?
           </h2>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -282,6 +283,8 @@ export default function LandingPage() {
               Ya tengo cuenta
             </Link>
           </div>
+
+          <ContactSocials />
         </div>
       </section>
 
