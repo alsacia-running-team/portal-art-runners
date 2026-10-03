@@ -7,6 +7,18 @@ export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 const RESEND_EMAILS_URL = 'https://api.resend.com/emails'
+// Debe usar un dominio verificado en la misma cuenta de Resend que RESEND_API_KEY
+// (onboarding@resend.dev solo entrega al dueño de la cuenta). RESEND_FROM_EMAIL lo sobrescribe.
+const DEFAULT_FROM_EMAIL = 'Alsacia Running Team <no-reply@artrunners.co>'
+
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
 
 // Sin caracteres ambiguos (0/O, 1/l/I) para evitar errores al copiar la clave.
 const PASSWORD_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'
@@ -26,6 +38,8 @@ async function sendApprovalEmail(email: string, firstName: string, password: str
   }
 
   const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login`
+  const safeName = escapeHtml(firstName)
+  const safeEmail = escapeHtml(email)
 
   const response = await fetch(RESEND_EMAILS_URL, {
     method: 'POST',
@@ -34,13 +48,13 @@ async function sendApprovalEmail(email: string, firstName: string, password: str
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      from: 'Alsacia Running Team <onboarding@resend.dev>',
+      from: process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL,
       to: email,
       subject: '¡Tu cuenta ha sido aprobada! - Alsacia Running Team',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
           <h1 style="color: #1a1a1a; font-size: 22px; margin-bottom: 8px;">
-            ¡Bienvenido(a) al equipo, ${firstName}!
+            ¡Bienvenido(a) al equipo, ${safeName}!
           </h1>
           <p style="color: #555; font-size: 15px; line-height: 1.6;">
             Tu cuenta en el portal de <strong>Alsacia Running Team</strong> ha sido aprobada
@@ -48,7 +62,7 @@ async function sendApprovalEmail(email: string, firstName: string, password: str
           </p>
           <div style="background:#f4f4f5; border-radius:8px; padding:16px; margin:16px 0;">
             <p style="color:#555; font-size:14px; margin:0 0 6px;">
-              <strong>Correo:</strong> ${email}
+              <strong>Correo:</strong> ${safeEmail}
             </p>
             <p style="color:#555; font-size:14px; margin:0;">
               <strong>Contraseña temporal:</strong>
@@ -114,7 +128,7 @@ export async function POST(request: NextRequest) {
 
     const { data: targetUser, error: targetError } = await admin
       .from('users')
-      .select('id, email, first_name, auth_id, account_status')
+      .select('id, email, first_name, auth_id, account_status, joined_at')
       .eq('id', userId)
       .single()
 
@@ -142,6 +156,20 @@ export async function POST(request: NextRequest) {
       }
 
       authId = created.user.id
+
+      // Vincula la cuenta de acceso de inmediato (la solicitud sigue pendiente) para que
+      // un reintento tras un fallo del correo reasigne la clave en vez de duplicar la cuenta.
+      const { error: linkError } = await admin
+        .from('users')
+        .update({ auth_id: authId })
+        .eq('id', userId)
+
+      if (linkError) {
+        return NextResponse.json(
+          { error: 'No se pudo vincular la cuenta de acceso: ' + linkError.message },
+          { status: 500 }
+        )
+      }
     } else {
       // Ya tenía cuenta de acceso: solo reasigna la contraseña temporal
       const { error: updateAuthError } = await admin.auth.admin.updateUserById(authId, {
@@ -155,12 +183,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // La clave solo se entrega por correo: si el envío falla, la solicitud no se aprueba.
+    try {
+      await sendApprovalEmail(targetUser.email, targetUser.first_name, password)
+    } catch (emailError) {
+      console.error('approve: no se pudo enviar el correo de aprobación', emailError)
+      return NextResponse.json(
+        {
+          error:
+            `No se pudo enviar el correo a ${targetUser.email}, por lo que la cuenta no fue aprobada. ` +
+            'Verifica la configuración de correo (dominio en Resend) e intenta de nuevo.',
+        },
+        { status: 502 }
+      )
+    }
+
     const { error: updateError } = await admin
       .from('users')
       .update({
         auth_id: authId,
         account_status: 'approved',
-        joined_at: new Date().toISOString().split('T')[0],
+        // Al regenerar el acceso de un miembro existente se conserva su fecha de ingreso.
+        joined_at: targetUser.joined_at ?? new Date().toISOString().split('T')[0],
       })
       .eq('id', userId)
 
@@ -170,8 +214,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
-
-    await sendApprovalEmail(targetUser.email, targetUser.first_name, password)
 
     return NextResponse.json({ success: true })
   } catch (error) {
