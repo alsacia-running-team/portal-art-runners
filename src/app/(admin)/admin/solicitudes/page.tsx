@@ -26,6 +26,7 @@ export default function SolicitudesPage() {
   const [loading, setLoading] = useState(true)
   const [approving, setApproving] = useState<string | null>(null)
   const [error, setError] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
   const supabase = createClient()
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function SolicitudesPage() {
   async function handleApprove(userId: string) {
     setApproving(userId)
     setError('')
+    setSuccessMessage('')
 
     const response = await fetch('/api/admin/approve', {
       method: 'POST',
@@ -57,6 +59,13 @@ export default function SolicitudesPage() {
     const data = await response.json().catch(() => ({}))
 
     if (response.ok) {
+      const solicitud = solicitudes.find(s => s.id === userId)
+      if (solicitud) {
+        setSuccessMessage(
+          `Cuenta de ${solicitud.first_name} ${solicitud.last_name} aprobada. ` +
+          `Se enviaron sus datos de acceso a ${solicitud.email}.`
+        )
+      }
       setSolicitudes(prev => prev.filter(s => s.id !== userId))
     } else {
       setError(data.error || 'No se pudo aprobar la solicitud. Intenta de nuevo.')
@@ -90,6 +99,11 @@ export default function SolicitudesPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
+          {successMessage && (
+            <div className="mb-4 bg-alsacia-cyan-50 text-alsacia-cyan-700 text-sm p-4 rounded-lg border border-alsacia-cyan-200">
+              {successMessage}
+            </div>
+          )}
           {error && (
             <div className="mb-4 bg-alsacia-pink-50 text-alsacia-pink-700 text-sm p-4 rounded-lg border border-alsacia-pink-200">
               {error}
