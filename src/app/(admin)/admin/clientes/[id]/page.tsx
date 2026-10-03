@@ -35,6 +35,8 @@ export default function EditarClientePage() {
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [resettingAccess, setResettingAccess] = useState(false)
+  const [accessMessage, setAccessMessage] = useState('')
   const supabase = createClient()
 
   useEffect(() => {
@@ -120,6 +122,29 @@ export default function EditarClientePage() {
     setSaving(false)
   }
 
+  async function handleResetAccess() {
+    if (!confirm(`Se enviará una nueva contraseña al correo de ${formData.first_name} (${formData.email}). La actual dejará de funcionar. ¿Continuar?`)) return
+
+    setResettingAccess(true)
+    setAccessMessage('')
+
+    const response = await fetch('/api/admin/approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: clientId }),
+    })
+    const data = await response.json().catch(() => ({}))
+
+    if (!response.ok) {
+      setAccessMessage(data.error || 'No se pudo generar el acceso. Intenta de nuevo.')
+    } else {
+      setAccessMessage(`Se envió una nueva contraseña a ${formData.email}.`)
+      setFormData(prev => ({ ...prev, account_status: 'approved' }))
+    }
+
+    setResettingAccess(false)
+  }
+
   function getPaymentStatus(): { label: string; isAlDia: boolean } {
     if (formData.is_courtesy) return { label: 'Al día (cortesía)', isAlDia: true }
     if (!formData.next_payment_date) return { label: 'Pendiente', isAlDia: false }
@@ -160,7 +185,7 @@ export default function EditarClientePage() {
 
   return (
     <div>
-      <div className="flex items-center gap-4 mb-8">
+      <div className="flex flex-wrap items-center gap-4 mb-8">
         <Button
           variant="outline"
           className="text-alsacia-blue-500 border-alsacia-blue-200 hover:bg-alsacia-blue-50"
@@ -174,7 +199,23 @@ export default function EditarClientePage() {
           </h1>
           <p className="text-gray-500 mt-1">Editar información del cliente</p>
         </div>
+        <div className="ml-auto">
+          <Button
+            variant="outline"
+            className="text-alsacia-blue-500 border-alsacia-blue-200 hover:bg-alsacia-blue-50"
+            onClick={handleResetAccess}
+            disabled={resettingAccess}
+          >
+            {resettingAccess ? 'Generando...' : 'Reenviar acceso por correo'}
+          </Button>
+        </div>
       </div>
+
+      {accessMessage && (
+        <div className="mb-4 bg-alsacia-blue-50 text-alsacia-blue-700 text-sm p-4 rounded-lg border border-alsacia-blue-200">
+          {accessMessage}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Datos personales */}
