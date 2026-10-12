@@ -70,7 +70,7 @@ export default function DashboardPage() {
       valueColor: 'text-alsacia-blue-700',
     },
     {
-      title: 'Pendientes aprobación',
+      title: 'Pendientes de aprobación',
       value: pendingApprovals,
       icon: (
         <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">

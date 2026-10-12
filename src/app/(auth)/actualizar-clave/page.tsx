@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { HomeLinkButton } from '@/components/auth-chrome'
 
 type RecoveryStatus = 'checking' | 'valid' | 'invalid'
 
@@ -73,7 +74,8 @@ export default function ActualizarClavePage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
+    <div className="relative min-h-screen flex flex-col lg:flex-row">
+      <HomeLinkButton />
       {/* Lado visual */}
       <div className="relative lg:w-1/2 bg-alsacia-blue-700 overflow-hidden min-h-[280px] lg:min-h-screen">
         <div className="absolute inset-0">

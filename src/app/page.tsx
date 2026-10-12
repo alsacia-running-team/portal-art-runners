@@ -2,10 +2,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ContactSocials } from '@/components/contact-socials'
 
-// Coordenadas de la Clínica de Nuestra Señora de La Paz (Cra 69 #12-75). Buscar por la
-// dirección sola ubica el pin en la Cra 67 y por el nombre aparecen dos sedes.
-const TRAINING_LOCATION_COORDS = '4.6389961,-74.1252266'
-const TRAINING_LOCATION_MAPS_URL = 'https://maps.google.com/?cid=8687827297163270372'
+// Ficha de Google Maps "Alsacia Running Team" (cancha junto a la Clínica de La Paz).
+// Se fija con coordenadas porque buscar solo por la dirección ubica el pin en la Cra 67.
+const TRAINING_LOCATION_COORDS = '4.6397768,-74.1257436'
+const TRAINING_LOCATION_EMBED_URL =
+  `https://www.google.com/maps?q=${encodeURIComponent('Alsacia Running Team')}&ll=${TRAINING_LOCATION_COORDS}&z=17&output=embed`
+const TRAINING_LOCATION_MAPS_URL = 'https://maps.google.com/?cid=9571011278797799191'
 
 export default function LandingPage() {
   return (
@@ -87,7 +89,7 @@ export default function LandingPage() {
               Nuestros servicios
             </p>
             <h2 className="text-3xl md:text-4xl font-bold text-alsacia-blue-800">
-              ¿Porque entrenar con Alsacia Running?
+              ¿Por qué entrenar con Alsacia Running?
             </h2>
           </div>
 
@@ -202,7 +204,7 @@ export default function LandingPage() {
                     <div className="mt-3 overflow-hidden rounded-lg border border-alsacia-blue-100">
                       <iframe
                         title="Mapa del punto de entrenamiento"
-                        src={`https://www.google.com/maps?q=${TRAINING_LOCATION_COORDS}&z=17&output=embed`}
+                        src={TRAINING_LOCATION_EMBED_URL}
                         className="block w-full h-32"
                         loading="lazy"
                         referrerPolicy="no-referrer-when-downgrade"

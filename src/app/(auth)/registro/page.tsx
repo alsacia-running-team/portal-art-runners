@@ -171,10 +171,10 @@ export default function RegistroPage() {
         <div className="w-full max-w-lg py-8">
           <div className="mb-8">
             <h2 className="text-2xl lg:text-3xl font-bold text-alsacia-blue-500 mb-2">
-              Registrate
+              Regístrate
             </h2>
             <p className="text-gray-500">
-              Completa tus datos para enviar tu solicitud, pronto serás contactado
+              Completa tus datos para enviar tu solicitud. Pronto te contactaremos.
             </p>
           </div>
 
@@ -225,7 +225,7 @@ export default function RegistroPage() {
 
             <div className="space-y-2">
               <Label htmlFor="phone" className="text-gray-700 font-medium">
-                Whatsapp / Teléfono
+                WhatsApp / Teléfono
               </Label>
               <Input
                 id="phone"
