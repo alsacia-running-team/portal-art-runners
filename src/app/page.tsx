@@ -67,7 +67,7 @@ export default function LandingPage() {
               href="/registro"
               className="w-full sm:w-auto bg-alsacia-cyan-400 text-alsacia-blue-900 font-bold px-8 py-4 rounded-xl text-lg hover:bg-alsacia-cyan-300 transition-all hover:scale-105"
             >
-              Quiero Unirme
+              Quiero unirme
             </Link>
             <Link
               href="#planes"
@@ -104,7 +104,7 @@ export default function LandingPage() {
               },
               {
                 title: 'Entrena con propósito',
-                description: 'Planes estructurados y progresivos para diferentes niveles, desde quienes están comenzando hasta corredores que preparan una competencia. Tu entrenador te acompaña en cada paso de tu proceso.',
+                description: 'Planes estructurados y progresivos para diferentes niveles, desde quienes están comenzando hasta corredores que preparan una competencia. El entrenador te acompaña en cada paso de tu proceso.',
                 icon: (
                   <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 00-2.455 2.456z" />
@@ -159,7 +159,7 @@ export default function LandingPage() {
               <h3 className="text-2xl font-bold text-alsacia-blue-800 mb-2">Plan Grupal</h3>
               <p className="text-gray-600 mb-6">
                 Planes desde{' '}
-                <span className="text-xl font-bold text-alsacia-blue-700">$61.250</span>
+                <span className="text-xl font-bold text-alsacia-blue-700">$61.250</span>/mes
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-start mb-8">
                 <div className="space-y-3">
@@ -199,7 +199,6 @@ export default function LandingPage() {
                       Ubicación
                     </div>
                     <p className="text-sm text-gray-600">Cancha múltiple al lado de Clínica de La Paz</p>
-                    <p className="text-sm text-gray-600">Carrera 69 #12-75</p>
                     <div className="mt-3 overflow-hidden rounded-lg border border-alsacia-blue-100">
                       <iframe
                         title="Mapa del punto de entrenamiento"
@@ -243,8 +242,7 @@ export default function LandingPage() {
               <h3 className="text-2xl font-bold text-white mb-2">Plan Personalizado</h3>
               <p className="text-alsacia-blue-200 mb-6">
                 Planes desde{' '}
-                <span className="text-xl font-bold text-alsacia-cyan-400">$132.000</span>{' '}
-                al mes
+                <span className="text-xl font-bold text-alsacia-cyan-400">$132.000</span>/mes
               </p>
               <div className="space-y-3 mb-8">
                 {[
@@ -273,7 +271,7 @@ export default function LandingPage() {
           </div>
 
           <p className="text-center text-gray-500 text-sm mt-8">
-            Los precios se informan al momento del registro. Consulta con el entrenador para más detalles.
+            Los precios se confirman al momento del registro. Consulta con el entrenador para más detalles.
           </p>
         </div>
       </section>
