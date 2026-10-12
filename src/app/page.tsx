@@ -54,21 +54,21 @@ export default function LandingPage() {
             />
           </div>
           <p className="text-lg sm:text-xl md:text-2xl text-alsacia-cyan-200 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Entrenamiento guiado para todos los niveles en ciudad Alsacia, Bogotá.
-            Entrena running en comunidad, cerca de tu casa.
+            Entrenamiento guiado para corredores de todos los niveles en Ciudad Alsacia, Bogotá.
+            Corre con tus vecinos, haz nuevos amigos y alcanza tus objetivos en equipo.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/registro"
               className="w-full sm:w-auto bg-alsacia-cyan-400 text-alsacia-blue-900 font-bold px-8 py-4 rounded-xl text-lg hover:bg-alsacia-cyan-300 transition-all hover:scale-105"
             >
-              Únete al equipo
+              Quiero Unirme
             </Link>
             <Link
               href="#planes"
               className="w-full sm:w-auto border-2 border-white/30 text-white font-semibold px-8 py-4 rounded-xl text-lg hover:bg-white/10 transition-all"
             >
-              Ver planes
+              Conoce nuestros planes
             </Link>
           </div>
         </div>
