@@ -2,6 +2,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ContactSocials } from '@/components/contact-socials'
 
+// Coordenadas de la Clínica de Nuestra Señora de La Paz (Cra 69 #12-75). Buscar por la
+// dirección sola ubica el pin en la Cra 67 y por el nombre aparecen dos sedes.
+const TRAINING_LOCATION_COORDS = '4.6389961,-74.1252266'
+const TRAINING_LOCATION_MAPS_URL = 'https://maps.google.com/?cid=8687827297163270372'
+
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white">
@@ -195,6 +200,23 @@ export default function LandingPage() {
                     </div>
                     <p className="text-sm text-gray-600">Cancha múltiple al lado de Clínica de La Paz</p>
                     <p className="text-sm text-gray-600">Carrera 69 #12-75</p>
+                    <div className="mt-3 overflow-hidden rounded-lg border border-alsacia-blue-100">
+                      <iframe
+                        title="Mapa del punto de entrenamiento"
+                        src={`https://www.google.com/maps?q=${TRAINING_LOCATION_COORDS}&z=17&output=embed`}
+                        className="block w-full h-32"
+                        loading="lazy"
+                        referrerPolicy="no-referrer-when-downgrade"
+                      />
+                    </div>
+                    <a
+                      href={TRAINING_LOCATION_MAPS_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-2 text-xs font-semibold text-alsacia-blue-600 hover:text-alsacia-blue-800"
+                    >
+                      Abrir en Google Maps →
+                    </a>
                   </div>
                 </div>
               </div>
