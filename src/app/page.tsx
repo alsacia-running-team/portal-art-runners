@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ContactSocials } from '@/components/contact-socials'
+import { TrainerProfile } from '@/components/landing/trainer-profile'
+import { CommunityGallery } from '@/components/landing/community-gallery'
 
 // Ficha de Google Maps "Alsacia Running Team" (cancha junto a la Clínica de La Paz).
 // Se fija con coordenadas porque buscar solo por la dirección ubica el pin en la Cra 67.
@@ -277,6 +279,10 @@ export default function LandingPage() {
           </p>
         </div>
       </section>
+
+      <TrainerProfile />
+
+      <CommunityGallery />
 
       {/* CTA Final */}
       <section className="relative py-20 md:py-28 px-4 overflow-hidden">
