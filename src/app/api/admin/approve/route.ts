@@ -125,7 +125,9 @@ export async function POST(request: NextRequest) {
       .from('users')
       .update({
         auth_id: authId,
-        account_status: 'approved',
+        // Restablecer la contraseña de un miembro suspendido no debe reactivarlo:
+        // solo una solicitud pendiente pasa a aprobada.
+        account_status: targetUser.account_status === 'pending' ? 'approved' : targetUser.account_status,
         // Al regenerar el acceso de un miembro existente se conserva su fecha de ingreso.
         joined_at: targetUser.joined_at ?? todayInBogota(),
       })

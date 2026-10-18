@@ -23,7 +23,7 @@ import {
   trainingGoalLabel,
   strengthTrainingLabel,
 } from '@/lib/registro-options'
-import { formatDate, isPaymentDue } from '@/lib/dates'
+import { isPaymentDue } from '@/lib/dates'
 
 export default function EditarClientePage() {
   const params = useParams()
@@ -111,6 +111,7 @@ export default function EditarClientePage() {
         joined_at: formData.joined_at,
         cutoff_date: formData.cutoff_date,
         next_payment_date: formData.next_payment_date,
+        last_payment_date: formData.last_payment_date,
       })
       .eq('id', clientId)
 
@@ -140,7 +141,6 @@ export default function EditarClientePage() {
       setAccessMessage(data.error || 'No se pudo generar el acceso. Intenta de nuevo.')
     } else {
       setAccessMessage(`Se envió una nueva contraseña a ${formData.email}.`)
-      setFormData(prev => ({ ...prev, account_status: 'approved' }))
     }
 
     setResettingAccess(false)
@@ -362,7 +362,7 @@ export default function EditarClientePage() {
               <Input
                 type="date"
                 value={formData.joined_at || ''}
-                onChange={(e) => updateField('joined_at', e.target.value)}
+                onChange={(e) => updateField('joined_at', e.target.value || null)}
                 className="h-11 border-gray-200"
               />
             </div>
@@ -372,7 +372,7 @@ export default function EditarClientePage() {
               <Input
                 type="date"
                 value={formData.cutoff_date || ''}
-                onChange={(e) => updateField('cutoff_date', e.target.value)}
+                onChange={(e) => updateField('cutoff_date', e.target.value || null)}
                 className="h-11 border-gray-200"
               />
             </div>
@@ -382,14 +382,22 @@ export default function EditarClientePage() {
               <Input
                 type="date"
                 value={formData.next_payment_date || ''}
-                onChange={(e) => updateField('next_payment_date', e.target.value)}
+                onChange={(e) => updateField('next_payment_date', e.target.value || null)}
                 className="h-11 border-gray-200"
               />
             </div>
 
-            <div className="flex justify-between items-center py-3 border-b border-gray-100">
-              <span className="text-sm text-gray-500">Último pago</span>
-              <span className="text-sm font-medium">{formatDate(formData.last_payment_date)}</span>
+            <div className="space-y-2">
+              <Label className="text-gray-700 font-medium">Último pago</Label>
+              <Input
+                type="date"
+                value={formData.last_payment_date || ''}
+                onChange={(e) => updateField('last_payment_date', e.target.value || null)}
+                className="h-11 border-gray-200"
+              />
+              <p className="text-xs text-gray-500">
+                Para pagos en efectivo o transferencia. Recuerda actualizar también el próximo pago.
+              </p>
             </div>
 
             <div className="flex justify-between items-center py-3 border-b border-gray-100">

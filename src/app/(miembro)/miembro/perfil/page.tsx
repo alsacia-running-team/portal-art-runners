@@ -147,11 +147,18 @@ export default function PerfilPage() {
             <CardTitle className="text-lg text-alsacia-blue-500">
               Datos personales
             </CardTitle>
-            <Link href="/miembro/editar">
-              <Button variant="outline" size="sm" className="text-alsacia-blue-500 border-alsacia-blue-200 hover:bg-alsacia-blue-50">
-                Editar
-              </Button>
-            </Link>
+            <div className="flex flex-wrap justify-end gap-2">
+              <Link href="/miembro/cambiar-clave">
+                <Button variant="outline" size="sm" className="text-alsacia-blue-500 border-alsacia-blue-200 hover:bg-alsacia-blue-50">
+                  Cambiar contraseña
+                </Button>
+              </Link>
+              <Link href="/miembro/editar">
+                <Button variant="outline" size="sm" className="text-alsacia-blue-500 border-alsacia-blue-200 hover:bg-alsacia-blue-50">
+                  Editar
+                </Button>
+              </Link>
+            </div>
           </CardHeader>
           <CardContent className="space-y-1">
             <ProfileField label="Nombres" value={user.first_name} />

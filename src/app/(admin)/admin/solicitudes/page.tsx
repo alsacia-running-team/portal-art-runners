@@ -135,14 +135,14 @@ export default function SolicitudesPage() {
                       <TableCell className="font-medium whitespace-nowrap">
                         {solicitud.first_name} {solicitud.last_name}
                       </TableCell>
-                      <TableCell className="text-gray-500">{solicitud.email}</TableCell>
+                      <TableCell className="text-gray-500 whitespace-normal break-all min-w-[160px]">{solicitud.email}</TableCell>
                       <TableCell className="whitespace-nowrap">{solicitud.phone}</TableCell>
                       <TableCell className="whitespace-nowrap">{interestedPlanLabel(solicitud.interested_plan)}</TableCell>
                       <TableCell>{livesInAlsaciaLabel(solicitud.lives_in_alsacia)}</TableCell>
                       <TableCell title={trainingLevelLabel(solicitud.training_level)}>
                         {solicitud.training_level ?? '—'}
                       </TableCell>
-                      <TableCell className="max-w-[200px]">{trainingGoalLabel(solicitud.training_goal)}</TableCell>
+                      <TableCell className="whitespace-normal min-w-[180px] max-w-[240px]">{trainingGoalLabel(solicitud.training_goal)}</TableCell>
                       <TableCell className="whitespace-nowrap">{strengthTrainingLabel(solicitud.strength_training)}</TableCell>
                       <TableCell className="text-gray-500 whitespace-nowrap">{formatDate(solicitud.created_at, 'short')}</TableCell>
                       <TableCell>
