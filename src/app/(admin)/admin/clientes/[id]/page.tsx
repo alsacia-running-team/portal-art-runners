@@ -23,6 +23,7 @@ import {
   trainingGoalLabel,
   strengthTrainingLabel,
 } from '@/lib/registro-options'
+import { formatDate, isPaymentDue } from '@/lib/dates'
 
 export default function EditarClientePage() {
   const params = useParams()
@@ -148,20 +149,10 @@ export default function EditarClientePage() {
   function getPaymentStatus(): { label: string; isAlDia: boolean } {
     if (formData.is_courtesy) return { label: 'Al día (cortesía)', isAlDia: true }
     if (!formData.next_payment_date) return { label: 'Pendiente', isAlDia: false }
-    const today = new Date()
-    const nextPayment = new Date(formData.next_payment_date)
-    if (today > nextPayment) return { label: 'Pendiente', isAlDia: false }
+    if (isPaymentDue(formData.next_payment_date)) return { label: 'Pendiente', isAlDia: false }
     return { label: 'Al día', isAlDia: true }
   }
 
-  function formatDate(dateString: string | null | undefined) {
-    if (!dateString) return 'No registrada'
-    return new Date(dateString).toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
 
   if (loading) {
     return (

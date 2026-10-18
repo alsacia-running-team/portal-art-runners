@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import type { User, Plan } from '@/types/database'
+import { formatDate, isPaymentDue } from '@/lib/dates'
 
 export default function PerfilPage() {
   const [user, setUser] = useState<User | null>(null)
@@ -49,9 +50,7 @@ export default function PerfilPage() {
     if (user.is_courtesy) return { label: 'Al día (cortesía)', isAlDia: true }
     if (!user.next_payment_date) return { label: 'Pendiente', isAlDia: false }
 
-    const today = new Date()
-    const nextPayment = new Date(user.next_payment_date)
-    return today > nextPayment
+    return isPaymentDue(user.next_payment_date)
       ? { label: 'Pendiente', isAlDia: false }
       : { label: 'Al día', isAlDia: true }
   }
@@ -60,14 +59,6 @@ export default function PerfilPage() {
     return user?.custom_price_cop ?? plan?.price_cop ?? 0
   }
 
-  function formatDate(dateString: string | null) {
-    if (!dateString) return 'No registrada'
-    return new Date(dateString).toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
 
   function formatPrice(amount: number) {
     return new Intl.NumberFormat('es-CO', {

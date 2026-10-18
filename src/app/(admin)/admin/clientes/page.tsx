@@ -23,6 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { User, Plan } from '@/types/database'
+import { isPaymentDue } from '@/lib/dates'
 
 type UserWithPlan = User & { plans: Plan | null }
 
@@ -66,9 +67,7 @@ export default function ClientesPage() {
   function getPaymentStatus(client: User): 'al_dia' | 'pendiente' {
     if (client.is_courtesy) return 'al_dia'
     if (!client.next_payment_date) return 'pendiente'
-    const today = new Date()
-    const nextPayment = new Date(client.next_payment_date)
-    return today > nextPayment ? 'pendiente' : 'al_dia'
+    return isPaymentDue(client.next_payment_date) ? 'pendiente' : 'al_dia'
   }
 
   function formatPrice(amount: number) {

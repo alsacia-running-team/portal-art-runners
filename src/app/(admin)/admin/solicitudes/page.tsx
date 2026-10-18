@@ -20,6 +20,7 @@ import {
   trainingGoalLabel,
   strengthTrainingLabel,
 } from '@/lib/registro-options'
+import { formatDate } from '@/lib/dates'
 
 export default function SolicitudesPage() {
   const [solicitudes, setSolicitudes] = useState<User[]>([])
@@ -74,13 +75,6 @@ export default function SolicitudesPage() {
     setApproving(null)
   }
 
-  function formatDate(dateString: string) {
-    return new Date(dateString).toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  }
 
   return (
     <div>
@@ -150,7 +144,7 @@ export default function SolicitudesPage() {
                       </TableCell>
                       <TableCell className="max-w-[200px]">{trainingGoalLabel(solicitud.training_goal)}</TableCell>
                       <TableCell className="whitespace-nowrap">{strengthTrainingLabel(solicitud.strength_training)}</TableCell>
-                      <TableCell className="text-gray-500 whitespace-nowrap">{formatDate(solicitud.created_at)}</TableCell>
+                      <TableCell className="text-gray-500 whitespace-nowrap">{formatDate(solicitud.created_at, 'short')}</TableCell>
                       <TableCell>
                         <Button
                           size="sm"

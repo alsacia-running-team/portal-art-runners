@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import type { User, Plan } from '@/types/database'
+import { formatDate, isPaymentDue } from '@/lib/dates'
 
 
 declare global {
@@ -232,9 +233,7 @@ export default function PagarPage() {
     if (!user) return { label: 'Sin datos', isAlDia: false }
     if (user.is_courtesy) return { label: 'Al día (cortesía)', isAlDia: true }
     if (!user.next_payment_date) return { label: 'Pendiente', isAlDia: false }
-    const today = new Date()
-    const nextPayment = new Date(user.next_payment_date)
-    if (today > nextPayment) return { label: 'Pendiente', isAlDia: false }
+    if (isPaymentDue(user.next_payment_date)) return { label: 'Pendiente', isAlDia: false }
     return { label: 'Al día', isAlDia: true }
   }
 
@@ -246,14 +245,6 @@ export default function PagarPage() {
     }).format(amount)
   }
 
-  function formatDate(dateString: string | null) {
-    if (!dateString) return 'No registrada'
-    return new Date(dateString).toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    })
-  }
 
   if (loading) {
     return (
