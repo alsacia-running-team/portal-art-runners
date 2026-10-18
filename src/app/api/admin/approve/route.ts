@@ -3,23 +3,10 @@ import { randomInt } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { todayInBogota } from '@/lib/dates'
+import { sendApprovalEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
-
-const RESEND_EMAILS_URL = 'https://api.resend.com/emails'
-// Debe usar un dominio verificado en la misma cuenta de Resend que RESEND_API_KEY
-// (onboarding@resend.dev solo entrega al dueño de la cuenta). RESEND_FROM_EMAIL lo sobrescribe.
-const DEFAULT_FROM_EMAIL = 'Alsacia Running Team <no-reply@artrunners.co>'
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;')
-}
 
 // Sin caracteres ambiguos (0/O, 1/l/I) para evitar errores al copiar la clave.
 const PASSWORD_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'
@@ -30,71 +17,6 @@ function generatePassword(length = 12): string {
     password += PASSWORD_ALPHABET[randomInt(PASSWORD_ALPHABET.length)]
   }
   return password
-}
-
-async function sendApprovalEmail(email: string, firstName: string, password: string) {
-  const resendApiKey = process.env.RESEND_API_KEY
-  if (!resendApiKey) {
-    throw new Error('RESEND_API_KEY no está configurada en el entorno del servidor')
-  }
-
-  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/login`
-  const safeName = escapeHtml(firstName)
-  const safeEmail = escapeHtml(email)
-
-  const response = await fetch(RESEND_EMAILS_URL, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: process.env.RESEND_FROM_EMAIL || DEFAULT_FROM_EMAIL,
-      to: email,
-      subject: '¡Tu cuenta ha sido aprobada! - Alsacia Running Team',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #1a1a1a; font-size: 22px; margin-bottom: 8px;">
-            ¡Bienvenido(a) al equipo, ${safeName}!
-          </h1>
-          <p style="color: #555; font-size: 15px; line-height: 1.6;">
-            Tu cuenta en el portal de <strong>Alsacia Running Team</strong> ha sido aprobada
-            por el administrador. Estas son tus credenciales para ingresar:
-          </p>
-          <div style="background:#f4f4f5; border-radius:8px; padding:16px; margin:16px 0;">
-            <p style="color:#555; font-size:14px; margin:0 0 6px;">
-              <strong>Correo:</strong> ${safeEmail}
-            </p>
-            <p style="color:#555; font-size:14px; margin:0;">
-              <strong>Contraseña temporal:</strong>
-              <span style="font-family:monospace; font-size:16px; letter-spacing:1px;">${password}</span>
-            </p>
-          </div>
-          <p style="color: #555; font-size: 15px; line-height: 1.6;">
-            Por seguridad, te recomendamos cambiar esta contraseña después de iniciar sesión
-            desde la opción <strong>¿Olvidaste tu contraseña?</strong>.
-          </p>
-          <div style="margin: 24px 0;">
-            <a href="${loginUrl}"
-               style="background-color: #171717; color: #fff; padding: 12px 24px;
-                      border-radius: 8px; text-decoration: none; font-size: 14px;
-                      font-weight: 500; display: inline-block;">
-              Ingresar al portal
-            </a>
-          </div>
-          <p style="color: #999; font-size: 12px; margin-top: 32px; border-top: 1px solid #eee; padding-top: 16px;">
-            Si tienes alguna duda, comunícate con tu entrenador.
-            <br/>Alsacia Running Team
-          </p>
-        </div>
-      `,
-    }),
-  })
-
-  if (!response.ok) {
-    const errorData = await response.text()
-    throw new Error('Error al enviar el correo: ' + errorData)
-  }
 }
 
 export async function POST(request: NextRequest) {

@@ -1,5 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendNewRegistrationAdminEmail, sendRegistrationReceivedEmail } from '@/lib/email'
+import { interestedPlanLabel } from '@/lib/registro-options'
+import { ADMIN_NOTIFICATION_EMAILS } from '@/lib/contact'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -108,6 +111,30 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    // La solicitud ya quedó guardada: los correos se envían después de responder
+    // y un fallo en el envío no debe hacer fallar el registro.
+    after(async () => {
+      const planLabel = interestedPlanLabel(interested_plan)
+
+      try {
+        await sendRegistrationReceivedEmail(email, first_name, planLabel)
+      } catch (emailError) {
+        console.error('register: no se pudo enviar la confirmación al miembro', emailError)
+      }
+
+      try {
+        await sendNewRegistrationAdminEmail(ADMIN_NOTIFICATION_EMAILS, {
+          firstName: first_name,
+          lastName: last_name,
+          email,
+          phone,
+          planLabel,
+        })
+      } catch (emailError) {
+        console.error('register: no se pudo enviar el aviso al admin', emailError)
+      }
+    })
 
     return NextResponse.json({ success: true })
   } catch {
