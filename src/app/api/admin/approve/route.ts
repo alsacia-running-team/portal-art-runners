@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { randomInt } from 'crypto'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { todayInBogota } from '@/lib/dates'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -204,7 +205,7 @@ export async function POST(request: NextRequest) {
         auth_id: authId,
         account_status: 'approved',
         // Al regenerar el acceso de un miembro existente se conserva su fecha de ingreso.
-        joined_at: targetUser.joined_at ?? new Date().toISOString().split('T')[0],
+        joined_at: targetUser.joined_at ?? todayInBogota(),
       })
       .eq('id', userId)
 

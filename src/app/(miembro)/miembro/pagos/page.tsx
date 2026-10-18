@@ -13,6 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { Payment, Plan } from '@/types/database'
+import { formatDate } from '@/lib/dates'
 
 type PaymentWithPlan = Payment & { plans: Plan | null }
 
@@ -47,14 +48,6 @@ export default function HistorialPagosPage() {
     setLoading(false)
   }
 
-  function formatDate(dateString: string | null) {
-    if (!dateString) return '—'
-    return new Date(dateString).toLocaleDateString('es-CO', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    })
-  }
 
   function formatPrice(amount: number) {
     return new Intl.NumberFormat('es-CO', {
@@ -118,7 +111,7 @@ export default function HistorialPagosPage() {
                 <TableBody>
                   {payments.map((payment) => (
                     <TableRow key={payment.id}>
-                      <TableCell className="font-medium">{formatDate(payment.paid_at)}</TableCell>
+                      <TableCell className="font-medium">{formatDate(payment.paid_at, 'short', '—')}</TableCell>
                       <TableCell className="text-gray-500">
                         {payment.plans
                           ? `${payment.plans.name} (${payment.plans.frequency})`
@@ -126,7 +119,7 @@ export default function HistorialPagosPage() {
                         }
                       </TableCell>
                       <TableCell className="text-sm text-gray-400">
-                        {formatDate(payment.period_start)} — {formatDate(payment.period_end)}
+                        {formatDate(payment.period_start, 'short', '—')} — {formatDate(payment.period_end, 'short', '—')}
                       </TableCell>
                       <TableCell className="font-semibold text-alsacia-blue-700">
                         {formatPrice(payment.amount_cop)}

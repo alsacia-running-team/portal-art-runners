@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Card, CardContent } from '@/components/ui/card'
 import type { User } from '@/types/database'
+import { isPaymentDue } from '@/lib/dates'
 
 export default function DashboardPage() {
   const [users, setUsers] = useState<User[]>([])
@@ -38,9 +39,7 @@ export default function DashboardPage() {
         pendiente++
         return
       }
-      const today = new Date()
-      const nextPayment = new Date(user.next_payment_date)
-      if (today > nextPayment) {
+      if (isPaymentDue(user.next_payment_date)) {
         pendiente++
       } else {
         alDia++
