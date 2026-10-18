@@ -23,7 +23,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import type { User, Plan } from '@/types/database'
-import { isPaymentDue } from '@/lib/dates'
+import { formatDate, isPaymentDue } from '@/lib/dates'
 
 type UserWithPlan = User & { plans: Plan | null }
 
@@ -197,11 +197,12 @@ export default function ClientesPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Nombre</TableHead>
-                    <TableHead>Correo</TableHead>
                     <TableHead>Plan</TableHead>
                     <TableHead>Precio</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead>Pago</TableHead>
+                    <TableHead>Fecha de corte</TableHead>
+                    <TableHead>Último pago</TableHead>
                     <TableHead>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -213,7 +214,6 @@ export default function ClientesPage() {
                         <TableCell className="font-medium">
                           {client.first_name} {client.last_name}
                         </TableCell>
-                        <TableCell className="text-gray-500">{client.email}</TableCell>
                         <TableCell>
                           {client.plans
                             ? <span className="text-sm">{client.plans.name} ({client.plans.frequency})</span>
@@ -248,6 +248,8 @@ export default function ClientesPage() {
                             {paymentStatus === 'al_dia' ? 'Al día' : 'Pendiente'}
                           </Badge>
                         </TableCell>
+                        <TableCell className="text-gray-600">{formatDate(client.cutoff_date, 'short', '—')}</TableCell>
+                        <TableCell className="text-gray-600">{formatDate(client.last_payment_date, 'short', '—')}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
                             <Button
