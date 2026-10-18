@@ -2,6 +2,7 @@ import { NextRequest, NextResponse, after } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { sendNewRegistrationAdminEmail, sendRegistrationReceivedEmail } from '@/lib/email'
 import { interestedPlanLabel } from '@/lib/registro-options'
+import { ADMIN_NOTIFICATION_EMAILS } from '@/lib/contact'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -123,21 +124,13 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        const { data: admins } = await admin
-          .from('users')
-          .select('email')
-          .eq('role', 'admin')
-        const adminEmails = (admins ?? []).map((a) => a.email).filter(Boolean)
-
-        if (adminEmails.length > 0) {
-          await sendNewRegistrationAdminEmail(adminEmails, {
-            firstName: first_name,
-            lastName: last_name,
-            email,
-            phone,
-            planLabel,
-          })
-        }
+        await sendNewRegistrationAdminEmail(ADMIN_NOTIFICATION_EMAILS, {
+          firstName: first_name,
+          lastName: last_name,
+          email,
+          phone,
+          planLabel,
+        })
       } catch (emailError) {
         console.error('register: no se pudo enviar el aviso al admin', emailError)
       }

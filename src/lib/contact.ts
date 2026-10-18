@@ -7,3 +7,6 @@ export const CONTACT = {
   strava: 'https://strava.app.link/Jrrqynsj03b',
   whatsapp: 'https://wa.me/message/R52CPKMCINT3G1',
 } as const
+
+// Correos que reciben el aviso de nueva solicitud de registro.
+export const ADMIN_NOTIFICATION_EMAILS = ['eguchuvo@gmail.com']
