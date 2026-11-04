@@ -163,7 +163,7 @@ export default function LandingPage() {
               <h3 className="text-2xl font-bold text-alsacia-blue-800 mb-2">Plan Grupal</h3>
               <p className="text-gray-600 mb-6">
                 Planes desde{' '}
-                <span className="text-xl font-bold text-alsacia-blue-700">$61.250</span>/mes
+                <span className="text-xl font-bold text-alsacia-blue-700">$79.000</span>/mes
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 items-start mb-8">
                 <div className="space-y-3">
@@ -245,8 +245,7 @@ export default function LandingPage() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Plan Personalizado</h3>
               <p className="text-alsacia-blue-200 mb-6">
-                Planes desde{' '}
-                <span className="text-xl font-bold text-alsacia-cyan-400">$132.000</span>/mes
+                <span className="text-xl font-bold text-alsacia-cyan-400">$150.000</span>/mes
               </p>
               <div className="space-y-3 mb-8">
                 {[
